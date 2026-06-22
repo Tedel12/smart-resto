@@ -15,7 +15,44 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
   const [selectedTable, setSelectedTable] = useState('Tous');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // ... (existing helper functions)
+  const s = {
+    sectionTitle: { color: D.text, fontSize: 18, fontWeight: 700, marginBottom: 20 },
+    input: { width: '100%', background: D.bg, border: `1px solid ${D.border}`, borderRadius: 8, padding: '10px 14px', color: D.text, fontFamily: dFont, fontSize: 13, outline: 'none' },
+  };
+
+  const tables = ['Tous', ...new Set(orders.map(o => o.table))];
+  const filteredOrders = selectedTable === 'Tous' ? orders : orders.filter(o => o.table === selectedTable);
+
+  const totalRevenue = orders.filter(o => o.status === 'servi').reduce((s, o) => s + o.total, 0);
+  const pending = orders.filter(o => o.status === 'en attente').length;
+  const inProgress = orders.filter(o => o.status === 'en cours').length;
+  const ready = orders.filter(o => o.status === 'prêt').length;
+
+  const STATUS_COLORS = {
+    'en attente': D.gold,
+    'en cours':   D.blue,
+    'prêt':       D.green,
+    'servi':      D.muted,
+  };
+  const STATUS_LIST = ['en attente', 'en cours', 'prêt', 'servi'];
+
+  const StatCard = ({ label, value, sub, color, icon: Icon }) => (
+    <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: '22px 24px', borderTop: `3px solid ${color}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <span style={{ color: D.muted, fontSize: 12, letterSpacing: 1, textTransform: 'uppercase' }}>{label}</span>
+        <Icon size={22} style={{ color }} />
+      </div>
+      <div style={{ color: D.text, fontSize: 28, fontWeight: 800, marginBottom: 4 }}>{value}</div>
+      {sub && <div style={{ color: D.muted, fontSize: 12 }}>{sub}</div>}
+    </div>
+  );
+
+  const getTableStatus = (tableName) => {
+    const tableOrders = orders.filter(o => o.table === tableName && o.status !== 'servi');
+    if (tableOrders.length === 0) return 'libre';
+    if (tableOrders.some(o => o.status === 'en attente' || o.status === 'en cours')) return 'occupée';
+    return 'prêt';
+  };
 
   return (
     <div style={{ display: 'flex', height: '100vh', background: D.bg, fontFamily: t.font || dFont, overflow: 'hidden', position: 'relative' }}>
@@ -34,11 +71,6 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
         {/* ... (rest of sidebar) */}
       </div>
       
-      {/* ... (rest of the component) */}
-    </div>
-  );
-}
-
       <div style={{ flex: 1, overflowY: 'auto' }}>
         <div style={{ padding: '28px 32px', maxWidth: 1200 }}>
           {tab === 'orders' && (

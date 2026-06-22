@@ -43,8 +43,48 @@ export function useCart() {
   return { items, add, remove, clear, total, count };
 }
 
+// ── CODE CORRIGÉ POUR USEORDERS ──
 export function useOrders() {
-  // ... (existing useOrders code)
+  const [orders, setOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sr_orders');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sr_orders', JSON.stringify(orders));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [orders]);
+
+  const addOrder = useCallback((orderData) => {
+    setOrders(prev => [
+      ...prev,
+      {
+        id: `ORD-${Date.now()}`,
+        table: orderData.table,
+        items: orderData.items,
+        status: 'En attente',
+        timestamp: new Date().toLocaleTimeString()
+      }
+    ]);
+  }, []);
+
+  const updateStatus = useCallback((id, newStatus) => {
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+  }, []);
+
+  const deleteOrder = useCallback((id) => {
+    setOrders(prev => prev.filter(o => o.id !== id));
+  }, []);
+
+  // LE RETURN SÉCURISÉ REQUIS PAR APP.JSX
+  return { orders, updateStatus, addOrder, deleteOrder };
 }
 
 export function useMediaQuery(query) {
