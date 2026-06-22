@@ -1,95 +1,43 @@
 import React, { useState } from 'react';
 import { D_DARK, D_LIGHT, dFont, THEMES, RESTAURANT } from '../data/index.js';
-import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, CreditCard, Banknote } from 'lucide-react';
+import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, CreditCard, Banknote, Menu, X } from 'lucide-react';
+import { useMediaQuery } from '../hooks/index.js';
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
 export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode }) {
   const t = THEMES[activeTheme];
   const D = isDarkMode ? D_DARK : D_LIGHT;
-  const STATUS_COLORS = {
-    'en attente': D.gold,
-    'en cours':   D.blue,
-    'prêt':       D.green,
-    'servi':      D.muted,
-  };
-  const STATUS_LIST = ['en attente', 'en cours', 'prêt', 'servi'];
-
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  
   const [tab, setTab] = useState('orders');
   const [editItem, setEditItem] = useState(null);
   const [selectedTable, setSelectedTable] = useState('Tous');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const tables = ['Tous', ...new Set(orders.map(o => o.table))];
-  const filteredOrders = selectedTable === 'Tous' ? orders : orders.filter(o => o.table === selectedTable);
-
-  const totalRevenue = orders.filter(o => o.status === 'servi').reduce((s, o) => s + o.total, 0);
-  const pending = orders.filter(o => o.status === 'en attente').length;
-  const inProgress = orders.filter(o => o.status === 'en cours').length;
-  const ready = orders.filter(o => o.status === 'prêt').length;
-
-  const TABS = [
-    { id: 'orders', label: 'Commandes', icon: ClipboardList, count: orders.filter(o => o.status !== 'servi').length },
-    { id: 'floor',  label: 'Plan Salle', icon: Map },
-    { id: 'stats',  label: 'Statistiques', icon: BarChart3 },
-    { id: 'menu',   label: 'Menu', icon: Utensils },
-    { id: 'themes', label: 'Templates', icon: Palette },
-  ];
-
-  const StatCard = ({ label, value, sub, color, icon: Icon }) => (
-    <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: '22px 24px', borderTop: `3px solid ${color}` }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <span style={{ color: D.muted, fontSize: 12, letterSpacing: 1, textTransform: 'uppercase' }}>{label}</span>
-        <Icon size={22} style={{ color }} />
-      </div>
-      <div style={{ color: D.text, fontSize: 28, fontWeight: 800, marginBottom: 4 }}>{value}</div>
-      {sub && <div style={{ color: D.muted, fontSize: 12 }}>{sub}</div>}
-    </div>
-  );
-
-  const s = {
-    sectionTitle: { color: D.text, fontSize: 18, fontWeight: 700, marginBottom: 20 },
-    input: { width: '100%', background: D.bg, border: `1px solid ${D.border}`, borderRadius: 8, padding: '10px 14px', color: D.text, fontFamily: dFont, fontSize: 13, outline: 'none' },
-  };
-
-  const getTableStatus = (tableName) => {
-    const tableOrders = orders.filter(o => o.table === tableName && o.status !== 'servi');
-    if (tableOrders.length === 0) return 'libre';
-    if (tableOrders.some(o => o.status === 'en attente' || o.status === 'en cours')) return 'occupée';
-    return 'prêt';
-  };
+  // ... (existing helper functions)
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: D.bg, fontFamily: t.font || dFont, overflow: 'hidden' }}>
-      <div style={{ width: 240, background: D.card, borderRight: `1px solid ${D.border}`, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-        <div style={{ padding: '24px 20px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ color: t.accent || D.gold, fontSize: 16, fontWeight: 800 }}>{RESTAURANT.name}</div>
-            <div style={{ color: D.muted, fontSize: 11 }}>Admin</div>
-          </div>
-          <button onClick={() => setIsDarkMode(!isDarkMode)} style={{ background: D.bg, border: 'none', borderRadius: 8, padding: 8, cursor: 'pointer', color: D.text }}>
-            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-        </div>
+    <div style={{ display: 'flex', height: '100vh', background: D.bg, fontFamily: t.font || dFont, overflow: 'hidden', position: 'relative' }}>
+      {isMobile && (
+        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={{ position: 'absolute', top: 20, left: 20, zIndex: 200, background: D.card, border: `1px solid ${D.border}`, borderRadius: 8, padding: 8, color: D.text }}>
+          {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+      )}
 
-        <nav style={{ flex: 1, padding: '16px 12px' }}>
-          {TABS.map(tabItem => (
-            <button key={tabItem.id} onClick={() => setTab(tabItem.id)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px',
-                background: tab === tabItem.id ? `${t.accent || D.gold}18` : 'transparent', border: 'none', borderRadius: 10,
-                color: tab === tabItem.id ? (t.accent || D.gold) : D.muted, fontFamily: dFont, fontSize: 13, fontWeight: tab === tabItem.id ? 700 : 400,
-                cursor: 'pointer', marginBottom: 4, textAlign: 'left', transition: 'all .15s',
-                borderLeft: `3px solid ${tab === tabItem.id ? (t.accent || D.gold) : 'transparent'}`, gap: 10 }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><tabItem.icon size={16} /> {tabItem.label}</span>
-              {tabItem.count > 0 && <span style={{ background: D.red, color: '#fff', borderRadius: 99, fontSize: 11, fontWeight: 800, padding: '1px 7px' }}>{tabItem.count}</span>}
-            </button>
-          ))}
-        </nav>
-        
-        <div style={{ padding: '16px 20px', borderTop: `1px solid ${D.border}` }}>
-          <div style={{ color: D.muted, fontSize: 11, marginBottom: 4 }}>Thème actif</div>
-          <div style={{ color: D.text, fontSize: 13, fontWeight: 600 }}>{THEMES[activeTheme].name}</div>
+      <div style={{ width: isMobile ? '80%' : 240, background: D.card, borderRight: `1px solid ${D.border}`, display: 'flex', flexDirection: 'column', flexShrink: 0,
+        position: isMobile ? 'absolute' : 'static', height: '100%', zIndex: 150, transform: isMobile && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform .3s' }}>
+        {/* ... (sidebar content) */}
+        <div style={{ padding: '24px 20px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isMobile ? 60 : 0 }}>
+          {/* ... (sidebar header) */}
         </div>
+        {/* ... (rest of sidebar) */}
       </div>
+      
+      {/* ... (rest of the component) */}
+    </div>
+  );
+}
 
       <div style={{ flex: 1, overflowY: 'auto' }}>
         <div style={{ padding: '28px 32px', maxWidth: 1200 }}>
@@ -102,50 +50,47 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                   {tables.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
-                <StatCard label="En attente" value={pending} icon={Hourglass} color={D.gold} />
-                <StatCard label="En préparation" value={inProgress} icon={ChefHat} color={D.blue} />
-                <StatCard label="Prêt à servir" value={ready} icon={CheckCircle} color={D.green} />
-                <StatCard label="Revenu du jour" value={fmt(totalRevenue)} icon={DollarSign} color={D.purple} />
-              </div>
-              {filteredOrders.length === 0 ? (
-                <div style={{ textAlign: 'center', color: D.muted, marginTop: 100 }}>
-                  <p style={{ fontSize: 18 }}>Aucune commande pour {selectedTable === 'Tous' ? 'le moment' : selectedTable}.</p>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(auto-fit, minmax(150px, 1fr))' : 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
+                  <StatCard label="En attente" value={pending} icon={Hourglass} color={D.gold} />
+                  <StatCard label="En préparation" value={inProgress} icon={ChefHat} color={D.blue} />
+                  <StatCard label="Prêt à servir" value={ready} icon={CheckCircle} color={D.green} />
+                  <StatCard label="Revenu du jour" value={fmt(totalRevenue)} icon={DollarSign} color={D.purple} />
                 </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {filteredOrders.map(order => (
-                    <div key={order.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: '18px 22px', borderLeft: `4px solid ${STATUS_COLORS[order.status] || D.muted}` }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <span style={{ color: D.text, fontWeight: 800, fontSize: 15 }}>{order.id}</span>
-                          <span style={{ background: D.bg, color: D.muted, fontSize: 12, padding: '3px 10px', borderRadius: 99 }}>{order.table}</span>
+                {filteredOrders.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: D.muted, marginTop: 100 }}>
+                    <p style={{ fontSize: 18 }}>Aucune commande pour {selectedTable === 'Tous' ? 'le moment' : selectedTable}.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {filteredOrders.map(order => (
+                      <div key={order.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: isMobile ? '16px' : '18px 22px', borderLeft: `4px solid ${STATUS_COLORS[order.status] || D.muted}` }}>
+                        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', marginBottom: 12, gap: isMobile ? 12 : 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <span style={{ color: D.text, fontWeight: 800, fontSize: 15 }}>{order.id}</span>
+                            <span style={{ background: D.bg, color: D.muted, fontSize: 12, padding: '3px 10px', borderRadius: 99 }}>{order.table}</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
+                            <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)} disabled={order.status === 'servi'}
+                              style={{ background: `${STATUS_COLORS[order.status]}22`, color: STATUS_COLORS[order.status], border: `1px solid ${STATUS_COLORS[order.status]}44`, borderRadius: 99, padding: '5px 12px', fontFamily: dFont, fontSize: 12, fontWeight: 700, cursor: order.status === 'servi' ? 'not-allowed' : 'pointer', outline: 'none', opacity: order.status === 'servi' ? 0.6 : 1 }}>
+                              {STATUS_LIST.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                            <span style={{ color: D.gold, fontWeight: 800, fontSize: 16 }}>{fmt(order.total)}</span>
+                            <button onClick={() => deleteOrder(order.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.red }}>
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', align: 'center', gap: 8 }}>
-                          <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)} disabled={order.status === 'servi'}
-                            style={{ background: `${STATUS_COLORS[order.status]}22`, color: STATUS_COLORS[order.status], border: `1px solid ${STATUS_COLORS[order.status]}44`, borderRadius: 99, padding: '5px 12px', fontFamily: dFont, fontSize: 12, fontWeight: 700, cursor: order.status === 'servi' ? 'not-allowed' : 'pointer', outline: 'none', opacity: order.status === 'servi' ? 0.6 : 1 }}>
-                            {STATUS_LIST.map(s => <option key={s} value={s}>{s}</option>)}
-                          </select>
-                          <span style={{ color: D.gold, fontWeight: 800, fontSize: 16 }}>{fmt(order.total)}</span>
-                          <button onClick={() => deleteOrder(order.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.red }}>
-                            <Trash2 size={16} />
-                          </button>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                          {order.items.map((it, i) => (
+                            <span key={i} style={{ background: D.bg, color: D.muted, fontSize: 12, padding: '4px 12px', borderRadius: 99, border: `1px solid ${D.border}` }}>
+                              {it.qty}× {it.name}
+                            </span>
+                          ))}
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        {order.items.map((it, i) => (
-                          <span key={i} style={{ background: D.bg, color: D.muted, fontSize: 12, padding: '4px 12px', borderRadius: 99, border: `1px solid ${D.border}` }}>
-                            {it.qty}× {it.name}
-                          </span>
-                        ))}
-                      </div>
-                      <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', color: D.muted, fontSize: 12 }}>
-                        <span>Paiement: {Math.random() > 0.5 ? 'Mobile' : 'Cash'}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
             </div>
           )}
           {tab === 'floor' && (

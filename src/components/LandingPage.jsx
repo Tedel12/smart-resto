@@ -331,7 +331,7 @@ function Theme4({ menu, onAdd, cart }) {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
           {(menu[currentCat] || []).map(item => {
             const qty = cart.items.find(i => i.id === item.id)?.qty || 0;
             return (

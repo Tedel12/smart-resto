@@ -34,5 +34,10 @@ body {
 .anim-glow     { animation: glow 2.4s ease-in-out infinite; }
 .anim-zoomSlow { animation: zoomSlow 8s ease forwards; }
 
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .hide-on-mobile { display: none !important; }
+}
+
 button { cursor: pointer; font-family: inherit; }
 img { display: block; max-width: 100%; }

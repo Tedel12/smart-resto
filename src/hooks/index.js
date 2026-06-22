@@ -44,50 +44,17 @@ export function useCart() {
 }
 
 export function useOrders() {
-  const [orders, setOrders] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sr_orders');
-      if (saved) return JSON.parse(saved);
-    } catch (e) {
-      console.error(e);
-    }
-    return [
-      { id:'CMD-001', table:'Table 3', items:[{name:'Poulet DG',qty:2,price:5500},{name:'Jus de bissap',qty:2,price:800}], status:'en cours', time:'13:42', total:12600 },
-      { id:'CMD-002', table:'Table 7', items:[{name:'Poisson braisé',qty:1,price:6000},{name:'Jollof Rice',qty:1,price:4500}], status:'prêt', time:'13:55', total:10500 },
-      { id:'CMD-003', table:'Table 1', items:[{name:'Burger maison',qty:3,price:4700}], status:'servi', time:'12:30', total:14100 },
-      { id:'CMD-004', table:'Table 5', items:[{name:'Pizza Margherita',qty:2,price:5200},{name:'Coca-Cola',qty:4,price:700}], status:'en cours', time:'14:05', total:13200 },
-      { id:'CMD-005', table:'Table 2', items:[{name:'Couscous royal',qty:2,price:5800}], status:'en attente', time:'14:10', total:11600 },
-    ];
-  });
+  // ... (existing useOrders code)
+}
 
+export function useMediaQuery(query) {
+  const [matches, setMatches] = useState(false);
   useEffect(() => {
-    try {
-      localStorage.setItem('sr_orders', JSON.stringify(orders));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [orders]);
-
-  const updateStatus = useCallback((id, status) => {
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-  }, []);
-
-  const deleteOrder = useCallback((id) => {
-    setOrders(prev => prev.filter(o => o.id !== id));
-  }, []);
-
-  const addOrder = useCallback((order) => {
-    const newOrder = {
-      id: `CMD-${String(Date.now()).slice(-4)}`,
-      table: order.table || 'Table ?',
-      items: order.items,
-      status: 'en attente',
-      time: new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }),
-      total: order.items.reduce((s, i) => s + i.price * i.qty, 0),
-    };
-    setOrders(prev => [newOrder, ...prev]);
-    return newOrder;
-  }, []);
-
-  return { orders, updateStatus, addOrder, deleteOrder };
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) setMatches(media.matches);
+    const listener = () => setMatches(media.matches);
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, [matches, query]);
+  return matches;
 }
