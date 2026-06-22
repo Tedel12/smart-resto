@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { THEMES, RESTAURANT } from '../data/index.js';
-import { Flame, ArrowRight, ChefHat, ShoppingBasket, Check, Minus, Plus, Palmtree, Zap, Star, Leaf, Coffee, Palette } from 'lucide-react';
+import { Flame, ArrowRight, ChefHat, Minus, Plus, Palmtree, Zap, Star, Leaf, Coffee, Palette } from 'lucide-react';
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
@@ -131,9 +131,9 @@ function Theme2({ menu, onAdd, cart }) {
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
-      <div style={{ background: `linear-gradient(135deg, ${t.accent}15, ${t.accent2}10)`, padding: '100px 24px 80px', textAlign: 'center', borderBottom: `1px solid ${t.border}` }}>
+      <div style={{ position: 'relative', background: `linear-gradient(135deg, ${t.accent}20, ${t.accent2}15)`, padding: '120px 24px 100px', textAlign: 'center', borderBottom: `1px solid ${t.border}` }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: t.accent, color: '#fff', fontSize: 11, fontWeight: 800, padding: '6px 18px', borderRadius: 99, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 24 }}>
-          <Star size={12} fill="white" /> Nouveau menu
+          Coffee & Lounge
         </span>
         <h1 style={{ fontSize: 'clamp(36px,7vw,72px)', fontWeight: 800, color: t.text, marginBottom: 18, lineHeight: 1.1 }}>{RESTAURANT.name}</h1>
         <p style={{ color: t.muted, fontSize: 18, marginBottom: 44, maxWidth: 520, margin: '0 auto 44px', lineHeight: 1.6 }}>{RESTAURANT.tagline}</p>
@@ -141,7 +141,7 @@ function Theme2({ menu, onAdd, cart }) {
           style={{ background: t.accent, color: '#fff', border: 'none', padding: '18px 48px', borderRadius: 99, fontSize: 16, fontWeight: 700, boxShadow: `0 10px 30px ${t.accent}44`, transition: 'all .2s', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 12 }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 15px 40px ${t.accent}55`; }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 10px 30px ${t.accent}44`; }}>
-          Commander maintenant <ArrowRight size={20} />
+          Explorer le Lounge <ArrowRight size={20} />
         </button>
       </div>
 
@@ -156,7 +156,7 @@ function Theme2({ menu, onAdd, cart }) {
         ))}
       </div>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 16px 80px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 16px 80px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
         {(menu[currentCat] || []).map(item => {
           const qty = cart.items.find(i => i.id === item.id)?.qty || 0;
           return (
@@ -167,7 +167,7 @@ function Theme2({ menu, onAdd, cart }) {
               <div style={{ position: 'relative', height: 220 }}>
                 <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 <div style={{ position: 'absolute', top: 12, left: 12, display: 'flex', gap: 8 }}>
-                  {item.hot && <span style={{ background: '#FF6B6B', color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 12px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 4, boxShadow: '0 4px 12px rgba(255,107,107,0.4)' }}><Flame size={14} /></span>}
+                  {item.hot && <span style={{ background: '#FF6B6B', color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 12px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 4 }}><Flame size={14} /></span>}
                   <Badge label={item.badge} accent={t.accent} accent2={t.accent2} />
                 </div>
               </div>
@@ -206,64 +206,59 @@ function Theme3({ menu, onAdd, cart }) {
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
-      <div style={{ background: t.accent, color: '#F7F4ED', textAlign: 'center', padding: '80px 24px 70px', borderBottom: `4px solid ${t.accent2}` }}>
+      <div style={{ background: `linear-gradient(135deg, ${t.accent}10, ${t.accent2}15)`, textAlign: 'center', padding: '100px 24px 80px', borderBottom: `4px solid ${t.border}` }}>
         <div style={{ fontSize: 12, letterSpacing: 5, textTransform: 'uppercase', marginBottom: 16, opacity: .8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-          <Leaf size={14} /> Depuis 1972 <Leaf size={14} />
+          <Leaf size={14} /> Pâtisseries & Délices <Leaf size={14} />
         </div>
-        <h1 style={{ fontSize: 'clamp(38px,7vw,80px)', fontWeight: 900, marginBottom: 16 }}>{RESTAURANT.name}</h1>
-        <p style={{ fontFamily: t.bodyFont || t.font, fontSize: 18, opacity: .75, marginBottom: 40 }}>{RESTAURANT.tagline}</p>
-        <div style={{ width: 80, height: 2, background: '#F7F4ED', margin: '0 auto 40px', opacity: .5 }} />
+        <h1 style={{ fontSize: 'clamp(38px,7vw,80px)', fontWeight: 900, marginBottom: 16, color: t.accent }}>{RESTAURANT.name}</h1>
+        <p style={{ fontSize: 18, opacity: .75, marginBottom: 40 }}>{RESTAURANT.tagline}</p>
         <button onClick={() => document.getElementById('menu-section3')?.scrollIntoView({ behavior: 'smooth' })}
-          style={{ background: 'transparent', color: '#F7F4ED', border: '2px solid #F7F4ED', padding: '15px 44px', fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s' }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#F7F4ED'; e.currentTarget.style.color = t.accent; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#F7F4ED'; }}>
+          style={{ background: t.accent, color: '#fff', border: 'none', padding: '15px 44px', fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}
+          onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}>
           Notre Carte
         </button>
       </div>
 
       <div id="menu-section3" style={{ maxWidth: 960, margin: '0 auto', padding: '60px 16px 80px' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 0, marginBottom: 50, borderBottom: `2px solid ${t.border}` }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 0, marginBottom: 50, borderBottom: `2px solid ${t.border}`, overflowX: 'auto', paddingBottom: 10 }}>
           {cats.map(cat => (
             <button key={cat} onClick={() => setActiveCat(cat)}
               style={{ padding: '16px 32px', background: 'none', border: 'none', fontFamily: t.font, fontSize: 15, fontWeight: 700,
                 color: activeCat === cat ? t.accent : t.muted, borderBottom: `3px solid ${activeCat === cat ? t.accent : 'transparent'}`,
-                marginBottom: -2, cursor: 'pointer', letterSpacing: 1, transition: 'all .2s' }}>
+                marginBottom: -2, cursor: 'pointer', letterSpacing: 1, transition: 'all .2s', whiteSpace: 'nowrap' }}>
               {cat.toUpperCase()}
             </button>
           ))}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, background: t.card, boxShadow: '0 10px 40px rgba(0,0,0,0.05)', borderRadius: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
           {(menu[currentCat] || []).map((item, i) => {
             const qty = cart.items.find(x => x.id === item.id)?.qty || 0;
             return (
-              <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 32, padding: '32px',
-                borderBottom: i < (menu[currentCat] || []).length - 1 ? `1px solid ${t.border}` : 'none', transition: 'background .2s' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#F9F7F2'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                <div style={{ width: 120, height: 120, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
+              <div key={item.id} className="theme3-zigzag" style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '24px', background: t.card, borderRadius: t.cardRadius, border: `1px solid ${t.border}`, boxShadow: '0 8px 30px rgba(0,0,0,0.03)' }}>
+                <div style={{ height: 180, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
                   <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                    <span style={{ fontWeight: 800, fontSize: 18, color: t.text }}>{item.name}</span>
-                    {item.hot && <span style={{ color: t.danger, fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}><Flame size={14} /> ÉPICÉ</span>}
-                  </div>
-                  <p style={{ color: t.muted, fontSize: 15, fontFamily: t.bodyFont || t.font, lineHeight: 1.6 }}>{item.desc}</p>
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0, minWidth: 140 }}>
-                  <div style={{ fontWeight: 900, fontSize: 20, color: t.accent, marginBottom: 16 }}>{fmt(item.price)}</div>
-                  {qty === 0 ? (
-                    <button onClick={() => onAdd(item)} style={{ background: t.accent, color: '#F7F4ED', border: 'none', padding: '10px 24px', fontSize: 13, fontWeight: 800, letterSpacing: 1, cursor: 'pointer', transition: 'all .2s' }}
-                      onMouseEnter={e => e.currentTarget.style.opacity = '.85'}
-                      onMouseLeave={e => e.currentTarget.style.opacity = '1'}>AJOUTER</button>
-                  ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end' }}>
-                      <button onClick={() => cart.remove(item.id)} style={{ width: 32, height: 32, border: `1px solid ${t.border}`, background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={16} /></button>
-                      <span style={{ fontWeight: 800, color: t.accent, minWidth: 20, textAlign: 'center', fontSize: 16 }}>{qty}</span>
-                      <button onClick={() => onAdd(item)} style={{ width: 32, height: 32, background: t.accent, border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={16} /></button>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                      <span style={{ fontWeight: 800, fontSize: 18, color: t.text }}>{item.name}</span>
                     </div>
-                  )}
+                    <p style={{ color: t.muted, fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>{item.desc}</p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 900, fontSize: 20, color: t.accent }}>{fmt(item.price)}</span>
+                    {qty === 0 ? (
+                      <button onClick={() => onAdd(item)} style={{ background: t.accent, color: '#fff', border: 'none', padding: '10px 24px', fontSize: 13, fontWeight: 800, letterSpacing: 1, cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}>AJOUTER</button>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <button onClick={() => cart.remove(item.id)} style={{ width: 32, height: 32, border: `1px solid ${t.border}`, background: 'white', cursor: 'pointer', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={16} /></button>
+                        <span style={{ fontWeight: 800, color: t.accent, minWidth: 20, textAlign: 'center', fontSize: 16 }}>{qty}</span>
+                        <button onClick={() => onAdd(item)} style={{ width: 32, height: 32, background: t.accent, border: 'none', color: 'white', cursor: 'pointer', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={16} /></button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -282,34 +277,26 @@ function Theme4({ menu, onAdd, cart }) {
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
-      <div style={{ textAlign: 'center', padding: '100px 24px 80px', background: `linear-gradient(180deg, ${t.accent}22 0%, transparent 100%)` }}>
-        <div style={{ fontSize: 12, letterSpacing: 8, color: t.accent2, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontWeight: 800 }}>
-          <Zap size={16} fill={t.accent2} /> Live · Fast · Fresh <Zap size={16} fill={t.accent2} />
+      <div style={{ textAlign: 'center', padding: '100px 24px 80px', background: `linear-gradient(180deg, ${t.accent}15 0%, transparent 100%)`, borderBottom: `1px solid ${t.border}` }}>
+        <div style={{ fontSize: 12, letterSpacing: 8, color: t.accent, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontWeight: 800 }}>
+          Menu Digital Table
         </div>
-        <h1 style={{ fontSize: 'clamp(48px,10vw,100px)', fontWeight: 900, lineHeight: .9, marginBottom: 24,
-          textShadow: `0 0 40px ${t.accent}aa`, letterSpacing: -2 }}>
-          <span style={{ color: t.accent }}>{RESTAURANT.name.split(' ')[0]}</span>
-          {' '}{RESTAURANT.name.split(' ').slice(1).join(' ')}
-        </h1>
-        <p style={{ color: t.muted, fontSize: 17, marginBottom: 48, maxWidth: 600, margin: '0 auto 48px' }}>{RESTAURANT.tagline}</p>
+        <h1 style={{ fontSize: 'clamp(36px, 8vw, 64px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: t.text }}>{RESTAURANT.name}</h1>
+        <p style={{ color: t.muted, fontSize: 17, marginBottom: 40 }}>{RESTAURANT.tagline}</p>
         <button onClick={() => document.getElementById('menu-section4')?.scrollIntoView({ behavior: 'smooth' })}
-          style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})`, color: '#0A0A1A', border: 'none',
-            padding: '18px 48px', borderRadius: 4, fontSize: 15, fontWeight: 900, letterSpacing: 2, textTransform: 'uppercase',
-            boxShadow: `0 0 30px ${t.accent}88`, cursor: 'pointer', transition: 'all .2s' }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05) rotate(-1deg)'; e.currentTarget.style.boxShadow = `0 0 50px ${t.accent}aa`; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 0 30px ${t.accent}88`; }}>
-          Commander <ArrowRight size={20} />
+          style={{ background: t.accent, color: '#ffffff', border: 'none', padding: '18px 48px', borderRadius: t.cardRadius, fontSize: 15, fontWeight: 900, cursor: 'pointer', transition: 'all .2s' }}>
+          Commander sur place <ArrowRight size={20} />
         </button>
       </div>
 
       <div id="menu-section4" style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 16px 80px' }}>
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 40, padding: '4px 0', scrollbarWidth: 'none' }}>
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginBottom: 40, paddingBottom: 8, scrollbarWidth: 'none' }}>
           {cats.map(cat => (
             <button key={cat} onClick={() => setActiveCat(cat)}
-              style={{ padding: '12px 28px', background: activeCat === cat ? `linear-gradient(135deg, ${t.accent}, ${t.accent2})` : t.card,
-                border: `2px solid ${activeCat === cat ? 'transparent' : t.border}`, color: activeCat === cat ? '#0A0A1A' : t.muted,
+              style={{ padding: '12px 28px', background: activeCat === cat ? t.accent : t.card,
+                border: `2px solid ${activeCat === cat ? 'transparent' : t.border}`, color: activeCat === cat ? '#fff' : t.muted,
                 fontFamily: t.font, fontSize: 13, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', whiteSpace: 'nowrap', cursor: 'pointer',
-                borderRadius: 4, transition: 'all .2s' }}>
+                borderRadius: t.cardRadius, transition: 'all .2s' }}>
               {cat}
             </button>
           ))}
@@ -319,35 +306,25 @@ function Theme4({ menu, onAdd, cart }) {
           {(menu[currentCat] || []).map(item => {
             const qty = cart.items.find(i => i.id === item.id)?.qty || 0;
             return (
-              <div key={item.id} style={{ background: t.card, border: `2px solid ${t.border}`, borderRadius: t.cardRadius, overflow: 'hidden',
-                transition: 'all .3s', position: 'relative' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = t.accent; e.currentTarget.style.boxShadow = `0 0 30px ${t.accent}33`; e.currentTarget.style.transform = 'translateY(-5px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = t.border; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = ''; }}>
+              <div key={item.id} style={{ background: t.card, border: `2px solid ${t.border}`, borderRadius: t.cardRadius, overflow: 'hidden', transition: 'all .3s', position: 'relative' }}>
                 <div style={{ position: 'relative', height: 180 }}>
-                  <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: .8 }} />
-                  <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${t.card} 10%, transparent 70%)` }} />
-                  <div style={{ position: 'absolute', top: 12, right: 12 }}>
-                    {item.hot && <span style={{ background: t.accent, color: '#000', fontSize: 10, fontWeight: 900, padding: '4px 8px', borderRadius: 2, display: 'flex', alignItems: 'center', gap: 4 }}><Flame size={12} fill="black" /></span>}
-                  </div>
-                  <div style={{ position: 'absolute', bottom: 12, left: 12 }}>
-                    {item.badge && <Badge label={item.badge} accent={t.accent} accent2={t.accent2} />}
-                  </div>
+                  <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ padding: '20px' }}>
-                  <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1, color: t.text }}>{item.name}</h3>
+                  <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 8, color: t.text }}>{item.name}</h3>
                   <p style={{ color: t.muted, fontSize: 13, marginBottom: 24, lineHeight: 1.5 }}>{item.desc}</p>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ fontWeight: 900, fontSize: 22, color: t.accent2, textShadow: `0 0 15px ${t.accent2}44` }}>{fmt(item.price)}</span>
+                    <span style={{ fontWeight: 900, fontSize: 22, color: t.accent }}>{fmt(item.price)}</span>
                     {qty === 0 ? (
                       <button onClick={() => onAdd(item)}
-                        style={{ background: t.accent, color: '#0A0A1A', border: 'none', padding: '10px 24px', borderRadius: 4, fontSize: 13, fontWeight: 900, letterSpacing: 1, cursor: 'pointer', textTransform: 'uppercase' }}>
-                        + Add
+                        style={{ background: t.accent, color: '#fff', border: 'none', padding: '10px 24px', borderRadius: t.cardRadius, fontSize: 13, fontWeight: 900, cursor: 'pointer' }}>
+                        + Ajouter
                       </button>
                     ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: t.bg, borderRadius: 4, padding: '4px' }}>
-                        <button onClick={() => cart.remove(item.id)} style={{ width: 32, height: 32, background: 'transparent', border: 'none', color: t.text, cursor: 'pointer', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={18} /></button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: t.bg, borderRadius: t.cardRadius, padding: '4px' }}>
+                        <button onClick={() => cart.remove(item.id)} style={{ width: 32, height: 32, background: 'transparent', border: 'none', color: t.text, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={18} /></button>
                         <span style={{ color: t.accent, fontWeight: 900, minWidth: 20, textAlign: 'center', fontSize: 16 }}>{qty}</span>
-                        <button onClick={() => onAdd(item)} style={{ width: 32, height: 32, background: t.accent, border: 'none', color: '#0A0A1A', cursor: 'pointer', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={18} /></button>
+                        <button onClick={() => onAdd(item)} style={{ width: 32, height: 32, background: t.accent, border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={18} /></button>
                       </div>
                     )}
                   </div>
@@ -369,15 +346,6 @@ function Theme5({ menu, onAdd, cart }) {
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.bodyFont || 'Inter, sans-serif' }}>
-      <style>{`
-        @media (min-width: 768px) {
-          .theme5-item { flex-direction: row !important; }
-          .theme5-info { text-align: left !important; }
-          .theme5-info-row { flex-direction: row !important; align-items: center !important; }
-          .theme5-price-container { text-align: right !important; }
-          .theme5-cart-container { justify-content: flex-end !important; }
-        }
-      `}</style>
       <div style={{ position: 'relative', height: 620, overflow: 'hidden' }}>
         <img src="https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=1600&q=80"
           alt="hero" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' }} />
@@ -424,13 +392,13 @@ function Theme5({ menu, onAdd, cart }) {
           <div style={{ width: 50, height: 1, background: t.accent2, margin: '24px auto 0' }} />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 40, borderBottom: `1px solid ${t.border}`, marginBottom: 60 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 40, borderBottom: `1px solid ${t.border}`, marginBottom: 60, overflowX: 'auto', paddingBottom: 10 }}>
           {cats.map(cat => (
             <button key={cat} onClick={() => setActiveCat(cat)}
               style={{ padding: '20px 10px', background: 'none', border: 'none', fontFamily: 'Inter, sans-serif', fontSize: 13,
                 letterSpacing: 4, textTransform: 'uppercase', color: activeCat === cat ? t.accent : t.muted,
                 borderBottom: `2px solid ${activeCat === cat ? t.accent : 'transparent'}`, marginBottom: -1,
-                cursor: 'pointer', transition: 'all .3s', fontWeight: activeCat === cat ? 700 : 400 }}>
+                cursor: 'pointer', transition: 'all .3s', fontWeight: activeCat === cat ? 700 : 400, whiteSpace: 'nowrap' }}>
               {cat}
             </button>
           ))}
@@ -498,27 +466,31 @@ export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveT
 
   return (
     <div style={{ position: 'relative' }}>
+      <style>{`
+        @media (min-width: 768px) {
+          .theme5-item { flex-direction: row !important; }
+          .theme5-info { text-align: left !important; }
+          .theme5-info-row { flex-direction: row !important; align-items: center !important; }
+          .theme5-price-container { text-align: right !important; }
+          .theme5-cart-container { justify-content: flex-end !important; }
+        }
+      `}</style>
       <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} />
-
-      <div style={{ position: 'fixed', left: 24, bottom: 24, zIndex: 100, display: 'flex', flexDirection: 'column-reverse', gap: 12 }}>
-        <button onClick={() => setShowSwitcher(s => !s)}
-          style={{ width: 56, height: 56, borderRadius: '50%', background: t.accent || '#F5A623', border: `4px solid white`, color: '#fff',
-            fontSize: 18, cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all .3s' }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1) rotate(15deg)'}
-          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
-          <Palette size={24} />
+      <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 100 }}>
+        <button onClick={() => setShowSwitcher(!showSwitcher)}
+          style={{ width: 50, height: 50, borderRadius: '50%', background: t.accent, border: 'none', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>
+          <Palette />
         </button>
-        {showSwitcher && Object.values(THEMES).map(th => (
-          <button key={th.id} onClick={() => { setActiveTheme(th.id); setShowSwitcher(false); }}
-            title={th.name}
-            style={{ width: 48, height: 48, borderRadius: '50%', border: `3px solid ${activeTheme === th.id ? 'white' : 'transparent'}`,
-              background: th.accent, cursor: 'pointer', fontSize: 13, fontWeight: 800, color: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              transition: 'all .2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
-            onMouseLeave={e => e.currentTarget.style.transform = ''}>
-            {th.id}
-          </button>
-        ))}
+        {showSwitcher && (
+          <div style={{ position: 'absolute', bottom: 60, left: 0, background: '#fff', borderRadius: 8, padding: 10, boxShadow: '0 4px 10px rgba(0,0,0,0.2)', width: 200 }}>
+            {Object.values(THEMES).map(th => (
+              <button key={th.id} onClick={() => { setActiveTheme(th.id); setShowSwitcher(false); }}
+                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '10px', cursor: 'pointer', color: '#000' }}>
+                {th.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -54,28 +54,31 @@ export const THEMES = {
     accent:'#F5A623', accent2:'#00D68F', danger:'#FF4757',
     font:`'Sora', system-ui, sans-serif`, fontImport:'Sora:wght@300;400;500;600;700;800',
     cardRadius:18, heroStyle:'dark-gold', chipStyle:'pill',
+    preview: 'Dark & Gold'
   },
   2: {
-    id:2, name:'Frais & Léger', sub:'Animé · Bistro moderne', animated:true,
-    bg:'#FFFBF5', card:'#FFFFFF', border:'#F0E6D8', text:'#2B2218', muted:'#A8967E',
-    accent:'#E8633D', accent2:'#3FA796', danger:'#D64545',
-    font:`'Plus Jakarta Sans', system-ui, sans-serif`, fontImport:'Plus+Jakarta+Sans:wght@300;400;500;600;700;800',
-    cardRadius:22, heroStyle:'light-warm', chipStyle:'pill',
+    id:2, name:'Coffee Lounge', sub:'Carousel horizontal', animated:true,
+    bg:'#F5EFE6', card:'#FFFFFF', border:'#E8DFD3', text:'#4A3728', muted:'#8C7865',
+    accent:'#A1887F', accent2:'#D7CCC8', danger:'#BF360C',
+    font:`'Inter', sans-serif`, fontImport:'Inter:wght@400;600',
+    cardRadius:16, heroStyle:'coffee', chipStyle:'pill',
+    preview: 'Coffee Carousel'
   },
   3: {
-    id:3, name:'Brasserie Classique', sub:'Statique · Élégant traditionnel', animated:false,
-    bg:'#F7F4ED', card:'#FFFFFF', border:'#D9CFB8', text:'#262017', muted:'#8C8068',
-    accent:'#7A2E2E', accent2:'#2E4B3F', danger:'#A33A3A',
-    font:`'Playfair Display', serif`, fontImport:'Playfair+Display:wght@400;500;600;700;800;900',
-    bodyFont:`'Source Sans 3', sans-serif`, bodyFontImport:'Source+Sans+3:wght@300;400;500;600;700',
-    cardRadius:4, heroStyle:'classic-serif', chipStyle:'square',
+    id:3, name:'Bakery Pastel', sub:'Zigzag Alterné', animated:false,
+    bg:'#FFF0F5', card:'#FFFFFF', border:'#FFD1DC', text:'#5D4037', muted:'#A1887F',
+    accent:'#F06292', accent2:'#81C784', danger:'#E57373',
+    font:`'Quicksand', sans-serif`, fontImport:'Quicksand:wght@400;600',
+    cardRadius:8, heroStyle:'bakery', chipStyle:'square',
+    preview: 'Pastel Zigzag'
   },
   4: {
-    id:4, name:'Néon Street Food', sub:'Animé · Fast-casual urbain', animated:true,
-    bg:'#11071F', card:'#1B0F2E', border:'#3A1F5C', text:'#F5EEFF', muted:'#8A7AAE',
-    accent:'#FF2E92', accent2:'#00F0FF', danger:'#FF3D3D',
-    font:`'Space Grotesk', system-ui, sans-serif`, fontImport:'Space+Grotesk:wght@300;400;500;600;700',
-    cardRadius:14, heroStyle:'neon', chipStyle:'angular',
+    id:4, name:'QR Digital Menu', sub:'Liste mobile-first', animated:false,
+    bg:'#FFFFFF', card:'#FAFAFA', border:'#EEEEEE', text:'#212121', muted:'#757575',
+    accent:'#007AFF', accent2:'#5856D6', danger:'#FF3B30',
+    font:`'SF Pro', sans-serif`, fontImport: null,
+    cardRadius:12, heroStyle:'minimal', chipStyle:'pill',
+    preview: 'Simple List'
   },
   5: {
     id:5, name:'Zen Africain', sub:'Statique · Haut de gamme Cotonou', animated:false,
@@ -84,6 +87,7 @@ export const THEMES = {
     font:`'Cormorant Garamond', serif`, fontImport:'Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600',
     bodyFont:`'Inter', sans-serif`, bodyFontImport:'Inter:wght@300;400;500;600',
     cardRadius:0, heroStyle:'zen-africa', chipStyle:'line',
+    preview: 'Zen African'
   },
 };
 

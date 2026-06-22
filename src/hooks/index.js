@@ -69,7 +69,7 @@ export function useOrders() {
         id: `ORD-${Date.now()}`,
         table: orderData.table,
         items: orderData.items,
-        status: 'En attente',
+        status: 'en attente',
         timestamp: new Date().toLocaleTimeString()
       }
     ]);

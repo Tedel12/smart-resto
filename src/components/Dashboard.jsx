@@ -3,7 +3,11 @@ import { D_DARK, D_LIGHT, dFont, THEMES, RESTAURANT } from '../data/index.js';
 import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, CreditCard, Banknote, Menu, X } from 'lucide-react';
 import { useMediaQuery } from '../hooks/index.js';
 
-const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
+const fmt = (n) => {
+  const value = n !== undefined && n !== null ? n : 0;
+  return value.toLocaleString('fr-FR') + ' FCFA';
+};
+
 
 export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode }) {
   const t = THEMES[activeTheme];
@@ -207,11 +211,15 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
           {tab === 'themes' && (
             <div>
               <h2 style={s.sectionTitle}>Templates</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
                 {Object.values(THEMES).map(th => (
                   <div key={th.id} onClick={() => setActiveTheme(th.id)}
-                    style={{ background: th.bg, border: `3px solid ${activeTheme === th.id ? th.accent : D.border}`, borderRadius: 14, padding: 20, cursor: 'pointer' }}>
-                    <div style={{ color: th.text, fontWeight: 700 }}>{th.name}</div>
+                    style={{ background: th.card, border: `3px solid ${activeTheme === th.id ? th.accent : D.border}`, borderRadius: 14, padding: 20, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div style={{ fontSize: 40 }}>{th.preview.split(' ')[0]}</div>
+                    <div>
+                      <div style={{ color: th.text, fontWeight: 700 }}>{th.name}</div>
+                      <div style={{ color: D.muted, fontSize: 12 }}>{th.sub}</div>
+                    </div>
                   </div>
                 ))}
               </div>
