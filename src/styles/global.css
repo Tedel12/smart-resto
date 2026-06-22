@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Sora', system-ui, sans-serif;
+  background: #0A0C0F;
+  color: #EEF0F6;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+
+@keyframes fadeUp   { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
+@keyframes fadeIn   { from { opacity:0 } to { opacity:1 } }
+@keyframes pop      { 0% { transform:scale(.88) } 60% { transform:scale(1.06) } 100% { transform:scale(1) } }
+@keyframes slide    { from { transform:translateX(100%);opacity:0 } to { transform:translateX(0);opacity:1 } }
+@keyframes ping     { 0% { transform:scale(1);opacity:.7 } 100% { transform:scale(2.2);opacity:0 } }
+@keyframes float    { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-7px) } }
+@keyframes glow     { 0%,100% { filter:brightness(1) } 50% { filter:brightness(1.3) } }
+@keyframes zoomSlow { from { transform:scale(1.07) } to { transform:scale(1) } }
+@keyframes shimmer  { 0% { background-position:-200% 0 } 100% { background-position:200% 0 } }
+@keyframes spin     { from { transform:rotate(0deg) } to { transform:rotate(360deg) } }
+
+.anim-fadeUp   { animation: fadeUp .38s ease both; }
+.anim-fadeIn   { animation: fadeIn .3s ease both; }
+.anim-pop      { animation: pop .25s ease both; }
+.anim-slide    { animation: slide .3s ease both; }
+.anim-float    { animation: float 3.2s ease-in-out infinite; }
+.anim-glow     { animation: glow 2.4s ease-in-out infinite; }
+.anim-zoomSlow { animation: zoomSlow 8s ease forwards; }
+
+button { cursor: pointer; font-family: inherit; }
+img { display: block; max-width: 100%; }
