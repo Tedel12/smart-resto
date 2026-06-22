@@ -4,7 +4,6 @@ import { Flame, ArrowRight, ChefHat, ShoppingBasket, Check, Minus, Plus, Palmtre
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
-/* ─── tiny ui primitives ─── */
 const Badge = ({ label, accent, accent2 }) => {
   const colors = { populaire: accent, chef: accent2, maison: accent2, léger: '#64B5F6', null: 'transparent' };
   const c = colors[label] || accent;
@@ -18,7 +17,6 @@ const Badge = ({ label, accent, accent2 }) => {
   );
 };
 
-/* ─── THEME 1: Élégance Sombre ─── */
 function Theme1({ menu, onAdd, cart }) {
   const t = THEMES[1];
   const cats = Object.keys(menu);
@@ -26,7 +24,6 @@ function Theme1({ menu, onAdd, cart }) {
   const [items, setItems] = useState(menu[activeCat]);
   const [animating, setAnimating] = useState(false);
 
-  // Synchronize items with menu when menu prop updates (e.g. from Admin Dashboard)
   React.useEffect(() => {
     setItems(menu[activeCat] || []);
   }, [menu, activeCat]);
@@ -39,7 +36,6 @@ function Theme1({ menu, onAdd, cart }) {
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
-      {/* Hero */}
       <div style={{ position: 'relative', height: 520, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'url(https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80) center/cover', filter: 'brightness(.25)' }} />
         <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, ${t.accent}18 0%, transparent 70%)` }} />
@@ -64,7 +60,6 @@ function Theme1({ menu, onAdd, cart }) {
         </div>
       </div>
 
-      {/* Category tabs */}
       <div id="menu-section" style={{ background: t.card, borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 20 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', overflowX: 'auto', gap: 4, padding: '0 16px' }}>
           {cats.map(cat => (
@@ -78,9 +73,8 @@ function Theme1({ menu, onAdd, cart }) {
         </div>
       </div>
 
-      {/* Grid */}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 16px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 20,
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20,
           opacity: animating ? 0 : 1, transition: 'opacity .2s' }}>
           {items.map((item) => {
             const qty = cart.items.find(i => i.id === item.id)?.qty || 0;
@@ -129,18 +123,14 @@ function Theme1({ menu, onAdd, cart }) {
   );
 }
 
-/* ─── THEME 2: Frais & Léger ─── */
 function Theme2({ menu, onAdd, cart }) {
   const t = THEMES[2];
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
-
-  // Handle case where active category might have been deleted
   const currentCat = menu[activeCat] ? activeCat : cats[0];
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
-      {/* Hero */}
       <div style={{ background: `linear-gradient(135deg, ${t.accent}15, ${t.accent2}10)`, padding: '100px 24px 80px', textAlign: 'center', borderBottom: `1px solid ${t.border}` }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: t.accent, color: '#fff', fontSize: 11, fontWeight: 800, padding: '6px 18px', borderRadius: 99, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 24 }}>
           <Star size={12} fill="white" /> Nouveau menu
@@ -155,7 +145,6 @@ function Theme2({ menu, onAdd, cart }) {
         </button>
       </div>
 
-      {/* Tabs */}
       <div id="menu-section2" style={{ overflowX: 'auto', display: 'flex', gap: 10, padding: '32px 16px', maxWidth: 1100, margin: '0 auto', scrollbarWidth: 'none' }}>
         {cats.map(cat => (
           <button key={cat} onClick={() => setActiveCat(cat)}
@@ -167,8 +156,7 @@ function Theme2({ menu, onAdd, cart }) {
         ))}
       </div>
 
-      {/* Cards */}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 16px 80px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 24 }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 16px 80px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
         {(menu[currentCat] || []).map(item => {
           const qty = cart.items.find(i => i.id === item.id)?.qty || 0;
           return (
@@ -210,12 +198,10 @@ function Theme2({ menu, onAdd, cart }) {
   );
 }
 
-/* ─── THEME 3: Brasserie Classique ─── */
 function Theme3({ menu, onAdd, cart }) {
   const t = THEMES[3];
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
-
   const currentCat = menu[activeCat] ? activeCat : cats[0];
 
   return (
@@ -288,12 +274,10 @@ function Theme3({ menu, onAdd, cart }) {
   );
 }
 
-/* ─── THEME 4: Néon Street Food ─── */
 function Theme4({ menu, onAdd, cart }) {
   const t = THEMES[4];
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
-
   const currentCat = menu[activeCat] ? activeCat : cats[0];
 
   return (
@@ -377,17 +361,23 @@ function Theme4({ menu, onAdd, cart }) {
   );
 }
 
-/* ─── THEME 5: ZEN AFRICAIN ─── */
 function Theme5({ menu, onAdd, cart }) {
   const t = THEMES[5];
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
-
   const currentCat = menu[activeCat] ? activeCat : cats[0];
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.bodyFont || 'Inter, sans-serif' }}>
-      {/* Hero — pleine hauteur, sobre */}
+      <style>{`
+        @media (min-width: 768px) {
+          .theme5-item { flex-direction: row !important; }
+          .theme5-info { text-align: left !important; }
+          .theme5-info-row { flex-direction: row !important; align-items: center !important; }
+          .theme5-price-container { text-align: right !important; }
+          .theme5-cart-container { justify-content: flex-end !important; }
+        }
+      `}</style>
       <div style={{ position: 'relative', height: 620, overflow: 'hidden' }}>
         <img src="https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=1600&q=80"
           alt="hero" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' }} />
@@ -414,7 +404,6 @@ function Theme5({ menu, onAdd, cart }) {
         </div>
       </div>
 
-      {/* Intro strip */}
       <div style={{ background: t.accent, padding: '24px 64px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 60, flexWrap: 'wrap' }}>
         {[
           { label: 'Authentique', icon: Leaf },
@@ -428,16 +417,13 @@ function Theme5({ menu, onAdd, cart }) {
         ))}
       </div>
 
-      {/* Menu section */}
       <div id="menu-section5" style={{ maxWidth: 1000, margin: '0 auto', padding: '100px 24px 120px' }}>
-        {/* Section heading */}
         <div style={{ textAlign: 'center', marginBottom: 80 }}>
           <div style={{ fontFamily: t.font, fontSize: 13, letterSpacing: 8, color: t.accent2, marginBottom: 16, textTransform: 'uppercase' }}>Notre sélection</div>
           <h2 style={{ fontFamily: t.font, fontSize: 'clamp(32px,5vw,60px)', fontWeight: 500, color: t.text, fontStyle: 'italic' }}>La Carte du Chef</h2>
           <div style={{ width: 50, height: 1, background: t.accent2, margin: '24px auto 0' }} />
         </div>
 
-        {/* Cat filter — line style */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: 40, borderBottom: `1px solid ${t.border}`, marginBottom: 60 }}>
           {cats.map(cat => (
             <button key={cat} onClick={() => setActiveCat(cat)}
@@ -450,47 +436,37 @@ function Theme5({ menu, onAdd, cart }) {
           ))}
         </div>
 
-        {/* Items — liste épurée */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
           {(menu[currentCat] || []).map((item, i) => {
             const qty = cart.items.find(x => x.id === item.id)?.qty || 0;
             const isLast = i === (menu[currentCat] || []).length - 1;
             return (
-              <div key={item.id}
-                style={{ display: 'grid', gridTemplateColumns: '140px 1fr auto', gap: 40, padding: '40px 0',
+              <div key={item.id} className="theme5-item"
+                style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '40px 0',
                   borderBottom: isLast ? 'none' : `1px solid ${t.border}`, alignItems: 'center',
-                  transition: 'all .3s' }}
-                onMouseEnter={e => { e.currentTarget.style.paddingLeft = '20px'; e.currentTarget.style.background = 'rgba(61,90,64,0.03)'; }}
-                onMouseLeave={e => { e.currentTarget.style.paddingLeft = '0'; e.currentTarget.style.background = 'transparent'; }}>
-                {/* Image carrée */}
+                  transition: 'all .3s' }}>
                 <div style={{ width: 140, height: 140, overflow: 'hidden', flexShrink: 0, borderRadius: 2 }}>
-                  <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .6s', filter: 'sepia(0.2) saturate(0.8)' }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                  <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .6s', filter: 'sepia(0.2) saturate(0.8)' }} />
                 </div>
-                {/* Info */}
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 15, marginBottom: 12 }}>
+                <div className="theme5-info" style={{ flex: 1, textAlign: 'center' }}>
+                  <div className="theme5-info-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 15, marginBottom: 12 }}>
                     <h3 style={{ fontFamily: t.font, fontSize: 24, fontWeight: 500, color: t.text }}>{item.name}</h3>
                     {item.hot && <span style={{ fontSize: 12, color: t.accent2, letterSpacing: 2, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6 }}><Flame size={14} /> Épicé</span>}
                   </div>
-                  <p style={{ color: t.muted, fontSize: 15, lineHeight: 1.8, marginBottom: 16, maxWidth: 500 }}>{item.desc}</p>
+                  <p style={{ color: t.muted, fontSize: 15, lineHeight: 1.8, marginBottom: 16 }}>{item.desc}</p>
                   {item.badge && <Badge label={item.badge} accent={t.accent} accent2={t.accent2} />}
                 </div>
-                {/* Prix + bouton */}
-                <div style={{ textAlign: 'right', flexShrink: 0, minWidth: 160 }}>
+                <div className="theme5-price-container" style={{ textAlign: 'center', flexShrink: 0, minWidth: 160 }}>
                   <div style={{ fontFamily: t.font, fontSize: 24, fontWeight: 600, color: t.accent, marginBottom: 20 }}>{fmt(item.price)}</div>
                   {qty === 0 ? (
                     <button onClick={() => onAdd(item)}
                       style={{ background: 'transparent', color: t.accent, border: `1px solid ${t.accent}`, padding: '12px 32px',
                         fontSize: 12, letterSpacing: 3, textTransform: 'uppercase', cursor: 'pointer', transition: 'all .3s',
-                        fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
-                      onMouseEnter={e => { e.currentTarget.style.background = t.accent; e.currentTarget.style.color = '#FAF8F3'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = t.accent; }}>
+                        fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
                       Ajouter
                     </button>
                   ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 15, justifyContent: 'flex-end' }}>
+                    <div className="theme5-cart-container" style={{ display: 'flex', alignItems: 'center', gap: 15, justifyContent: 'center' }}>
                       <button onClick={() => cart.remove(item.id)} style={{ width: 32, height: 32, border: `1px solid ${t.border}`, background: 'white', cursor: 'pointer', color: t.text, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={16} /></button>
                       <span style={{ fontFamily: t.font, fontSize: 20, color: t.accent, minWidth: 24, textAlign: 'center', fontWeight: 600 }}>{qty}</span>
                       <button onClick={() => onAdd(item)} style={{ width: 32, height: 32, background: t.accent, border: 'none', color: '#FAF8F3', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={16} /></button>
@@ -503,7 +479,6 @@ function Theme5({ menu, onAdd, cart }) {
         </div>
       </div>
 
-      {/* Footer */}
       <div style={{ background: '#1C1A15', color: 'rgba(250,248,243,.4)', textAlign: 'center', padding: '60px 24px', fontSize: 13, letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>
         <div style={{ color: t.accent2, marginBottom: 16, fontFamily: t.font, fontSize: 22, fontStyle: 'italic' }}>{RESTAURANT.name}</div>
         <div style={{ marginBottom: 20 }}>Cotonou · République du Bénin · +229 00 00 00 00</div>
@@ -515,11 +490,9 @@ function Theme5({ menu, onAdd, cart }) {
   );
 }
 
-/* ─── MAIN LANDING PAGE ─── */
 export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveTheme }) {
   const [showSwitcher, setShowSwitcher] = useState(false);
   const t = THEMES[activeTheme];
-
   const COMPONENTS = { 1: Theme1, 2: Theme2, 3: Theme3, 4: Theme4, 5: Theme5 };
   const ActiveTheme = COMPONENTS[activeTheme];
 
@@ -527,7 +500,6 @@ export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveT
     <div style={{ position: 'relative' }}>
       <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} />
 
-      {/* Floating theme switcher */}
       <div style={{ position: 'fixed', left: 24, bottom: 24, zIndex: 100, display: 'flex', flexDirection: 'column-reverse', gap: 12 }}>
         <button onClick={() => setShowSwitcher(s => !s)}
           style={{ width: 56, height: 56, borderRadius: '50%', background: t.accent || '#F5A623', border: `4px solid white`, color: '#fff',

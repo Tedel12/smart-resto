@@ -98,21 +98,21 @@ export default function App() {
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 150,
         background: navBg, backdropFilter: 'blur(12px)',
         borderBottom: `1px solid ${navBorder}`, display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', padding: '0 24px', height: 56, transition: 'all 0.3s' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span style={{ color: navLogoColor, fontWeight: 800, fontSize: 18, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Trees size={20} /> {RESTAURANT.name}
+        justifyContent: 'space-between', padding: '0 12px', height: 56, transition: 'all 0.3s' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ color: navLogoColor, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Trees size={18} /> {RESTAURANT.name}
           </span>
           <div style={{ width: 1, height: 20, background: navBorder }} />
           <button onClick={() => setView('landing')}
             style={{ background: view === 'landing' ? `${currentTheme.accent}22` : 'none', color: view === 'landing' ? currentTheme.accent : currentTheme.muted,
-              border: 'none', padding: '6px 14px', borderRadius: 8, fontFamily: currentTheme.font, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s' }}>
-            <Globe size={16} /> Vitrine
+              border: 'none', padding: '6px 8px', borderRadius: 8, fontFamily: currentTheme.font, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, transition: 'all 0.2s' }}>
+            <Globe size={14} /> Vitrine
           </button>
           <button onClick={() => setView('dashboard')}
             style={{ background: view === 'dashboard' ? `${currentTheme.accent}22` : 'none', color: view === 'dashboard' ? currentTheme.accent : currentTheme.muted,
-              border: 'none', padding: '6px 14px', borderRadius: 8, fontFamily: currentTheme.font, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s' }}>
-            <Settings size={16} /> Dashboard
+              border: 'none', padding: '6px 8px', borderRadius: 8, fontFamily: currentTheme.font, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, transition: 'all 0.2s' }}>
+            <Settings size={14} /> Admin
           </button>
         </div>
 

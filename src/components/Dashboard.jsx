@@ -64,11 +64,40 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
 
       <div style={{ width: isMobile ? '80%' : 240, background: D.card, borderRight: `1px solid ${D.border}`, display: 'flex', flexDirection: 'column', flexShrink: 0,
         position: isMobile ? 'absolute' : 'static', height: '100%', zIndex: 150, transform: isMobile && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform .3s' }}>
-        {/* ... (sidebar content) */}
         <div style={{ padding: '24px 20px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isMobile ? 60 : 0 }}>
-          {/* ... (sidebar header) */}
+          <div>
+            <div style={{ color: t.accent || D.gold, fontSize: 16, fontWeight: 800 }}>{RESTAURANT.name}</div>
+            <div style={{ color: D.muted, fontSize: 11 }}>Admin</div>
+          </div>
+          <button onClick={() => setIsDarkMode(!isDarkMode)} style={{ background: D.bg, border: 'none', borderRadius: 8, padding: 8, cursor: 'pointer', color: D.text }}>
+            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
         </div>
-        {/* ... (rest of sidebar) */}
+
+        <nav style={{ flex: 1, padding: '16px 12px' }}>
+          {[
+            { id: 'orders', label: 'Commandes', icon: ClipboardList, count: orders.filter(o => o.status !== 'servi').length },
+            { id: 'floor',  label: 'Plan Salle', icon: Map },
+            { id: 'stats',  label: 'Statistiques', icon: BarChart3 },
+            { id: 'menu',   label: 'Menu', icon: Utensils },
+            { id: 'themes', label: 'Templates', icon: Palette },
+          ].map(tabItem => (
+            <button key={tabItem.id} onClick={() => { setTab(tabItem.id); setIsSidebarOpen(false); }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px',
+                background: tab === tabItem.id ? `${t.accent || D.gold}18` : 'transparent', border: 'none', borderRadius: 10,
+                color: tab === tabItem.id ? (t.accent || D.gold) : D.muted, fontFamily: dFont, fontSize: 13, fontWeight: tab === tabItem.id ? 700 : 400,
+                cursor: 'pointer', marginBottom: 4, textAlign: 'left', transition: 'all .15s',
+                borderLeft: `3px solid ${tab === tabItem.id ? (t.accent || D.gold) : 'transparent'}`, gap: 10 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><tabItem.icon size={16} /> {tabItem.label}</span>
+              {tabItem.count > 0 && <span style={{ background: D.red, color: '#fff', borderRadius: 99, fontSize: 11, fontWeight: 800, padding: '1px 7px' }}>{tabItem.count}</span>}
+            </button>
+          ))}
+        </nav>
+        
+        <div style={{ padding: '16px 20px', borderTop: `1px solid ${D.border}` }}>
+          <div style={{ color: D.muted, fontSize: 11, marginBottom: 4 }}>Thème actif</div>
+          <div style={{ color: D.text, fontSize: 13, fontWeight: 600 }}>{THEMES[activeTheme].name}</div>
+        </div>
       </div>
       
       <div style={{ flex: 1, overflowY: 'auto' }}>
