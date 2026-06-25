@@ -42,6 +42,22 @@ export default function App() {
     }
   });
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [restaurant, setRestaurant] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sr_restaurant');
+      return saved ? JSON.parse(saved) : RESTAURANT;
+    } catch (e) {
+      return RESTAURANT;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sr_restaurant', JSON.stringify(restaurant));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [restaurant]);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -77,9 +93,9 @@ export default function App() {
     showToast(<><Check size={16} /> {item.name} ajouté</>, D.green);
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = (comment) => {
     if (cart.items.length === 0) return;
-    addOrder({ table: RESTAURANT.table, items: cart.items });
+    addOrder({ table: RESTAURANT.table, items: cart.items, comment });
     cart.clear();
     setShowCart(false);
     showToast(<><PartyPopper size={16} /> Commande envoyée en cuisine !</>, D.gold);
@@ -101,7 +117,7 @@ export default function App() {
         justifyContent: 'space-between', padding: '0 12px', height: 56, transition: 'all 0.3s' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ color: navLogoColor, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Trees size={18} /> {RESTAURANT.name}
+            <Trees size={18} /> {restaurant.name}
           </span>
           <div style={{ width: 1, height: 20, background: navBorder }} />
           <button onClick={() => setView('landing')}
@@ -117,7 +133,7 @@ export default function App() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ color: currentTheme.muted, fontSize: 12 }}>{RESTAURANT.table}</span>
+          <span style={{ color: currentTheme.muted, fontSize: 12 }}>{restaurant.table}</span>
           {view === 'landing' && (
             <button onClick={() => setShowCart(true)} style={{ position: 'relative', background: currentTheme.accent, border: 'none',
               color: getAccentBtnText(activeTheme), padding: '8px 18px', borderRadius: 99, fontFamily: currentTheme.font, fontSize: 13, fontWeight: 800, cursor: 'pointer',
@@ -139,15 +155,15 @@ export default function App() {
       {/* ── Content (with top padding for nav) ── */}
       <div style={{ paddingTop: 56 }}>
         {view === 'landing' ? (
-          <LandingPage menu={menu} cart={cart} onAdd={handleAdd} activeTheme={activeTheme} setActiveTheme={setActiveTheme} />
+          <LandingPage menu={menu} cart={cart} onAdd={handleAdd} activeTheme={activeTheme} setActiveTheme={setActiveTheme} restaurant={restaurant} />
         ) : (
-          <Dashboard menu={menu} setMenu={setMenu} orders={orders} updateStatus={updateStatus} deleteOrder={deleteOrder} activeTheme={activeTheme} setActiveTheme={setActiveTheme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+          <Dashboard menu={menu} setMenu={setMenu} orders={orders} updateStatus={updateStatus} deleteOrder={deleteOrder} activeTheme={activeTheme} setActiveTheme={setActiveTheme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} restaurant={restaurant} setRestaurant={setRestaurant} showToast={showToast} />
         )}
       </div>
 
       {/* ── Cart Sidebar ── */}
       {showCart && (
-        <CartSidebar cart={cart} onClose={() => setShowCart(false)} onCheckout={handleCheckout} />
+        <CartSidebar cart={cart} onClose={() => setShowCart(false)} onCheckout={handleCheckout} theme={currentTheme} />
       )}
 
       {/* ── Toast notification ── */}

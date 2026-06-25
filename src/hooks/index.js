@@ -63,6 +63,7 @@ export function useOrders() {
   }, [orders]);
 
   const addOrder = useCallback((orderData) => {
+    const total = orderData.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
     setOrders(prev => [
       ...prev,
       {
@@ -70,7 +71,9 @@ export function useOrders() {
         table: orderData.table,
         items: orderData.items,
         status: 'en attente',
-        timestamp: new Date().toLocaleTimeString()
+        timestamp: new Date().toLocaleTimeString(),
+        total: total,
+        comment: orderData.comment
       }
     ]);
   }, []);

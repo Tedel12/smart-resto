@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { THEMES, RESTAURANT } from '../data/index.js';
 import { Flame, ArrowRight, ChefHat, Minus, Plus, Palmtree, Zap, Star, Leaf, Coffee, Palette } from 'lucide-react';
+import Footer from './Footer.jsx';
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
@@ -17,7 +18,7 @@ const Badge = ({ label, accent, accent2 }) => {
   );
 };
 
-function Theme1({ menu, onAdd, cart }) {
+function Theme1({ menu, onAdd, cart, restaurant }) {
   const t = THEMES[1];
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
@@ -45,9 +46,9 @@ function Theme1({ menu, onAdd, cart }) {
           </div>
           <h1 style={{ fontSize: 'clamp(42px,8vw,88px)', fontWeight: 800, lineHeight: 1, marginBottom: 16,
             background: `linear-gradient(135deg, #fff 30%, ${t.accent})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            {RESTAURANT.name}
+            {restaurant.name}
           </h1>
-          <p style={{ color: t.muted, fontSize: 17, marginBottom: 36 }}>{RESTAURANT.tagline}</p>
+          <p style={{ color: t.muted, fontSize: 17, marginBottom: 36 }}>{restaurant.tagline}</p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             <button onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })}
               style={{ background: t.accent, color: '#000', border: 'none', padding: '14px 32px', borderRadius: 99,
@@ -119,11 +120,12 @@ function Theme1({ menu, onAdd, cart }) {
           })}
         </div>
       </div>
+      <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-function Theme2({ menu, onAdd, cart }) {
+function Theme2({ menu, onAdd, cart, restaurant }) {
   const t = THEMES[2];
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
@@ -135,8 +137,8 @@ function Theme2({ menu, onAdd, cart }) {
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: t.accent, color: '#fff', fontSize: 11, fontWeight: 800, padding: '6px 18px', borderRadius: 99, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 24 }}>
           Coffee & Lounge
         </span>
-        <h1 style={{ fontSize: 'clamp(36px,7vw,72px)', fontWeight: 800, color: t.text, marginBottom: 18, lineHeight: 1.1 }}>{RESTAURANT.name}</h1>
-        <p style={{ color: t.muted, fontSize: 18, marginBottom: 44, maxWidth: 520, margin: '0 auto 44px', lineHeight: 1.6 }}>{RESTAURANT.tagline}</p>
+        <h1 style={{ fontSize: 'clamp(36px,7vw,72px)', fontWeight: 800, color: t.text, marginBottom: 18, lineHeight: 1.1 }}>{restaurant.name}</h1>
+        <p style={{ color: t.muted, fontSize: 18, marginBottom: 44, maxWidth: 520, margin: '0 auto 44px', lineHeight: 1.6 }}>{restaurant.tagline}</p>
         <button onClick={() => document.getElementById('menu-section2')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: '#fff', border: 'none', padding: '18px 48px', borderRadius: 99, fontSize: 16, fontWeight: 700, boxShadow: `0 10px 30px ${t.accent}44`, transition: 'all .2s', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 12 }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 15px 40px ${t.accent}55`; }}
@@ -194,11 +196,12 @@ function Theme2({ menu, onAdd, cart }) {
           );
         })}
       </div>
+      <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-function Theme3({ menu, onAdd, cart }) {
+function Theme3({ menu, onAdd, cart, restaurant }) {
   const t = THEMES[3];
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
@@ -210,8 +213,8 @@ function Theme3({ menu, onAdd, cart }) {
         <div style={{ fontSize: 12, letterSpacing: 5, textTransform: 'uppercase', marginBottom: 16, opacity: .8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <Leaf size={14} /> Pâtisseries & Délices <Leaf size={14} />
         </div>
-        <h1 style={{ fontSize: 'clamp(38px,7vw,80px)', fontWeight: 900, marginBottom: 16, color: t.accent }}>{RESTAURANT.name}</h1>
-        <p style={{ fontSize: 18, opacity: .75, marginBottom: 40 }}>{RESTAURANT.tagline}</p>
+        <h1 style={{ fontSize: 'clamp(38px,7vw,80px)', fontWeight: 900, marginBottom: 16, color: t.accent }}>{restaurant.name}</h1>
+        <p style={{ fontSize: 18, opacity: .75, marginBottom: 40 }}>{restaurant.tagline}</p>
         <button onClick={() => document.getElementById('menu-section3')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: '#fff', border: 'none', padding: '15px 44px', fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}
           onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
@@ -265,11 +268,12 @@ function Theme3({ menu, onAdd, cart }) {
           })}
         </div>
       </div>
+      <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-function Theme4({ menu, onAdd, cart }) {
+function Theme4({ menu, onAdd, cart, restaurant }) {
   const t = THEMES[4];
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
@@ -281,8 +285,8 @@ function Theme4({ menu, onAdd, cart }) {
         <div style={{ fontSize: 12, letterSpacing: 8, color: t.accent, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontWeight: 800 }}>
           Menu Digital Table
         </div>
-        <h1 style={{ fontSize: 'clamp(36px, 8vw, 64px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: t.text }}>{RESTAURANT.name}</h1>
-        <p style={{ color: t.muted, fontSize: 17, marginBottom: 40 }}>{RESTAURANT.tagline}</p>
+        <h1 style={{ fontSize: 'clamp(36px, 8vw, 64px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: t.text }}>{restaurant.name}</h1>
+        <p style={{ color: t.muted, fontSize: 17, marginBottom: 40 }}>{restaurant.tagline}</p>
         <button onClick={() => document.getElementById('menu-section4')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: '#ffffff', border: 'none', padding: '18px 48px', borderRadius: t.cardRadius, fontSize: 15, fontWeight: 900, cursor: 'pointer', transition: 'all .2s' }}>
           Commander sur place <ArrowRight size={20} />
@@ -334,11 +338,12 @@ function Theme4({ menu, onAdd, cart }) {
           })}
         </div>
       </div>
+      <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-function Theme5({ menu, onAdd, cart }) {
+function Theme5({ menu, onAdd, cart, restaurant }) {
   const t = THEMES[5];
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
@@ -355,7 +360,7 @@ function Theme5({ menu, onAdd, cart }) {
              <Palmtree size={18} /> Dakar · Cotonou · Abidjan
           </div>
           <h1 style={{ fontFamily: t.font, fontSize: 'clamp(52px,8vw,96px)', fontWeight: 600, color: '#FAF8F3', lineHeight: 1.1, marginBottom: 24, fontStyle: 'italic' }}>
-            {RESTAURANT.name}
+            {restaurant.name}
           </h1>
           <div style={{ width: 60, height: 1, background: t.accent2, marginBottom: 32 }} />
           <p style={{ color: 'rgba(250,248,243,.8)', fontSize: 18, lineHeight: 1.8, marginBottom: 48, maxWidth: 450 }}>
@@ -448,17 +453,18 @@ function Theme5({ menu, onAdd, cart }) {
       </div>
 
       <div style={{ background: '#1C1A15', color: 'rgba(250,248,243,.4)', textAlign: 'center', padding: '60px 24px', fontSize: 13, letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>
-        <div style={{ color: t.accent2, marginBottom: 16, fontFamily: t.font, fontSize: 22, fontStyle: 'italic' }}>{RESTAURANT.name}</div>
-        <div style={{ marginBottom: 20 }}>Cotonou · République du Bénin · +229 00 00 00 00</div>
+        <div style={{ color: t.accent2, marginBottom: 16, fontFamily: t.font, fontSize: 22, fontStyle: 'italic' }}>{restaurant.name}</div>
+        <div style={{ marginBottom: 20 }}>{restaurant.footer.address} · {restaurant.footer.phone}</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 24, color: 'rgba(250,248,243,.2)' }}>
            <Star size={16} /> <Star size={16} /> <Star size={16} />
         </div>
       </div>
+      <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveTheme }) {
+export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveTheme, restaurant }) {
   const [showSwitcher, setShowSwitcher] = useState(false);
   const t = THEMES[activeTheme];
   const COMPONENTS = { 1: Theme1, 2: Theme2, 3: Theme3, 4: Theme4, 5: Theme5 };
@@ -475,7 +481,7 @@ export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveT
           .theme5-cart-container { justify-content: flex-end !important; }
         }
       `}</style>
-      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} />
+      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} />
       <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 100 }}>
         <button onClick={() => setShowSwitcher(!showSwitcher)}
           style={{ width: 50, height: 50, borderRadius: '50%', background: t.accent, border: 'none', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>

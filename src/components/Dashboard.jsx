@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { D_DARK, D_LIGHT, dFont, THEMES, RESTAURANT } from '../data/index.js';
-import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, CreditCard, Banknote, Menu, X } from 'lucide-react';
+import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, CreditCard, Banknote, Menu, Mail, Phone, MapPin } from 'lucide-react';
+import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { useMediaQuery } from '../hooks/index.js';
 
 const fmt = (n) => {
-  const value = n !== undefined && n !== null ? n : 0;
-  return value.toLocaleString('fr-FR') + ' FCFA';
+  const value = Number(n);
+  return (isNaN(value) ? 0 : value).toLocaleString('fr-FR') + ' FCFA';
 };
 
 
-export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode }) {
+export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode, restaurant, setRestaurant, showToast }) {
   const t = THEMES[activeTheme];
   const D = isDarkMode ? D_DARK : D_LIGHT;
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -18,10 +19,31 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
   const [editItem, setEditItem] = useState(null);
   const [selectedTable, setSelectedTable] = useState('Tous');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [newCat, setNewCat] = useState('');
+  const [draftRestaurant, setDraftRestaurant] = useState(restaurant);
 
   const s = {
     sectionTitle: { color: D.text, fontSize: 18, fontWeight: 700, marginBottom: 20 },
     input: { width: '100%', background: D.bg, border: `1px solid ${D.border}`, borderRadius: 8, padding: '10px 14px', color: D.text, fontFamily: dFont, fontSize: 13, outline: 'none' },
+  };
+
+  const updateFooter = (key, value) => {
+    setDraftRestaurant(prev => ({
+        ...prev,
+        footer: { ...prev.footer, [key]: value }
+    }));
+  };
+
+  const updateSocial = (platform, value) => {
+    setDraftRestaurant(prev => ({
+        ...prev,
+        footer: { ...prev.footer, socials: { ...prev.footer.socials, [platform]: value } }
+    }));
+  };
+
+  const saveConfig = () => {
+    setRestaurant(draftRestaurant);
+    if (showToast) showToast('Configuration enregistrée !');
   };
 
   const tables = ['Tous', ...new Set(orders.map(o => o.table))];
@@ -54,7 +76,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
   const getTableStatus = (tableName) => {
     const tableOrders = orders.filter(o => o.table === tableName && o.status !== 'servi');
     if (tableOrders.length === 0) return 'libre';
-    if (tableOrders.some(o => o.status === 'en attente' || o.status === 'en cours')) return 'occupée';
+    if (tableOrders.some(o => o.status === 'en attente' || o.status === 'en cours')) return 'occupée';     
     return 'prêt';
   };
 
@@ -85,6 +107,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
             { id: 'stats',  label: 'Statistiques', icon: BarChart3 },
             { id: 'menu',   label: 'Menu', icon: Utensils },
             { id: 'themes', label: 'Templates', icon: Palette },
+            { id: 'footer', label: 'Configuration Footer', icon: MapPin },
           ].map(tabItem => (
             <button key={tabItem.id} onClick={() => { setTab(tabItem.id); setIsSidebarOpen(false); }}
               style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px',
@@ -151,6 +174,11 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                               {it.qty}× {it.name}
                             </span>
                           ))}
+                          {order.comment && (
+                              <div style={{ background: D.gold + '22', color: D.gold, fontSize: 12, padding: '4px 12px', borderRadius: 99, border: `1px solid ${D.gold}44`, marginTop: 5, width: '100%' }}>
+                                  Note: {order.comment}
+                              </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -192,11 +220,22 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                 <h2 style={s.sectionTitle}>Gestion Menu</h2>
                 <button onClick={() => setEditItem('new')} style={{ background: D.gold, color: isDarkMode ? '#000' : '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>+ Ajouter un plat</button>
               </div>
+
+              <div style={{ marginBottom: 20, display: 'flex', gap: 10 }}>
+                <input type="text" placeholder="Nouvelle catégorie" value={newCat} onChange={(e) => setNewCat(e.target.value)} style={s.input} />
+                <button onClick={() => {
+                  if (newCat && !menu[newCat]) {
+                    setMenu(prev => ({ ...prev, [newCat]: [] }));
+                    setNewCat('');
+                  }
+                }} style={{ background: D.blue, color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Créer</button>
+              </div>
+
               {Object.entries(menu).map(([cat, items]) => (
                 <div key={cat} style={{ marginBottom: 32 }}>
                   <div style={{ color: D.gold, fontSize: 13, fontWeight: 700, marginBottom: 12 }}>{cat}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {items.map(item => (
+                    {(items || []).map(item => (
                       <div key={item.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
                         <div style={{ flex: 1 }}>{item.name}</div>
                         <button onClick={() => setEditItem(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><Pencil size={16} color={D.blue} /></button>
@@ -222,6 +261,38 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+          {tab === 'footer' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <h2 style={s.sectionTitle}>Personnalisation Footer</h2>
+                <button onClick={saveConfig} style={{ background: D.gold, color: isDarkMode ? '#000' : '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Enregistrer</button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                <div style={{ background: D.card, padding: 20, borderRadius: 12 }}>
+                  <label style={{ color: D.muted, fontSize: 12 }}>Adresse</label>
+                  <input value={draftRestaurant.footer.address} onChange={e => updateFooter('address', e.target.value)} style={{...s.input, marginBottom: 10}} />
+                  
+                  <label style={{ color: D.muted, fontSize: 12 }}>Téléphone</label>
+                  <input value={draftRestaurant.footer.phone} onChange={e => updateFooter('phone', e.target.value)} style={{...s.input, marginBottom: 10}} />
+                  
+                  <label style={{ color: D.muted, fontSize: 12 }}>Email</label>
+                  <input value={draftRestaurant.footer.email} onChange={e => updateFooter('email', e.target.value)} style={{...s.input}} />
+                </div>
+                <div style={{ background: D.card, padding: 20, borderRadius: 12 }}>
+                  <label style={{ color: D.muted, fontSize: 12 }}>Facebook</label>
+                  <input value={draftRestaurant.footer.socials.facebook} onChange={e => updateSocial('facebook', e.target.value)} style={{...s.input, marginBottom: 10}} />
+                  
+                  <label style={{ color: D.muted, fontSize: 12 }}>Instagram</label>
+                  <input value={draftRestaurant.footer.socials.instagram} onChange={e => updateSocial('instagram', e.target.value)} style={{...s.input, marginBottom: 10}} />
+                  
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', marginTop: 10 }}>
+                    <input type="checkbox" checked={draftRestaurant.footer.newsletterEnabled} onChange={e => updateFooter('newsletterEnabled', e.target.checked)} />
+                    <span style={{ color: D.text }}>Activer Newsletter</span>
+                  </label>
+                </div>
               </div>
             </div>
           )}
@@ -276,8 +347,18 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
               </div>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <label style={{ color: D.muted, fontSize: 12, fontWeight: 600 }}>URL de l'image</label>
-                <input type="text" defaultValue={itemToEdit.img} id="edit-img" style={s.input} />
+                <label style={{ color: D.muted, fontSize: 12, fontWeight: 600 }}>Image</label>
+                <input type="file" accept="image/*" onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            document.getElementById('edit-img').value = reader.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }} style={s.input} />
+                <input type="text" defaultValue={itemToEdit.img} id="edit-img" style={{...s.input, display: 'none'}} />
               </div>
 
               <div style={{ display: 'flex', gap: 24, alignItems: 'center', marginTop: 4 }}>

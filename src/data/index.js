@@ -3,6 +3,13 @@ export const RESTAURANT = {
   tagline: 'Cuisine locale & internationale',
   table: 'Table 7',
   logo: '',
+  footer: {
+    address: 'Cotonou, Bénin',
+    phone: '+229 00 00 00 00',
+    email: 'contact@lebaobab.com',
+    socials: { facebook: '#', instagram: '#' },
+    newsletterEnabled: true
+  }
 };
 
 export const MENU = {
