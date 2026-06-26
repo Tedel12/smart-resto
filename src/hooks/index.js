@@ -73,7 +73,8 @@ export function useOrders() {
         status: 'en attente',
         timestamp: new Date().toLocaleTimeString(),
         total: total,
-        comment: orderData.comment
+        comment: orderData.comment,
+        paymentMethod: orderData.paymentMethod
       }
     ]);
   }, []);

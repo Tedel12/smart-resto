@@ -5,6 +5,16 @@ import Footer from './Footer.jsx';
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
+// Utility to determine if a color is light or dark to return black or white text
+const getContrastColor = (hexColor) => {
+  if (!hexColor) return '#fff';
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return (yiq >= 128) ? '#000' : '#fff';
+};
+
 const Badge = ({ label, accent, accent2 }) => {
   const colors = { populaire: accent, chef: accent2, maison: accent2, léger: '#64B5F6', null: 'transparent' };
   const c = colors[label] || accent;
@@ -18,8 +28,7 @@ const Badge = ({ label, accent, accent2 }) => {
   );
 };
 
-function Theme1({ menu, onAdd, cart, restaurant }) {
-  const t = THEMES[1];
+function Theme1({ menu, onAdd, cart, restaurant, theme: t }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const [items, setItems] = useState(menu[activeCat]);
@@ -51,7 +60,7 @@ function Theme1({ menu, onAdd, cart, restaurant }) {
           <p style={{ color: t.muted, fontSize: 17, marginBottom: 36 }}>{restaurant.tagline}</p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             <button onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })}
-              style={{ background: t.accent, color: '#000', border: 'none', padding: '14px 32px', borderRadius: 99,
+              style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '14px 32px', borderRadius: 99,
                 fontSize: 14, fontWeight: 700, letterSpacing: 1, transition: 'transform .15s', cursor: 'pointer' }}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.04)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
@@ -101,7 +110,7 @@ function Theme1({ menu, onAdd, cart, restaurant }) {
                     <span style={{ color: t.accent, fontWeight: 800, fontSize: 18 }}>{fmt(item.price)}</span>
                     {qty === 0 ? (
                       <button onClick={() => onAdd(item)}
-                        style={{ background: t.accent, color: '#000', border: 'none', padding: '10px 22px', borderRadius: 99, fontSize: 12, fontWeight: 800, transition: 'all .2s', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
+                        style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '10px 22px', borderRadius: 99, fontSize: 12, fontWeight: 800, transition: 'all .2s', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
                         onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = `0 4px 12px ${t.accent}44`; }}
                         onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}>
                         <Plus size={14} /> Ajouter
@@ -110,7 +119,7 @@ function Theme1({ menu, onAdd, cart, restaurant }) {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: t.bg, padding: '4px', borderRadius: 99, border: `1px solid ${t.border}` }}>
                         <button onClick={() => cart.remove(item.id)} style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: 'transparent', color: t.text, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
                         <span style={{ fontWeight: 800, color: t.accent, minWidth: 20, textAlign: 'center' }}>{qty}</span>
-                        <button onClick={() => onAdd(item)} style={{ width: 28, height: 28, borderRadius: '50%', background: t.accent, border: 'none', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
+                        <button onClick={() => onAdd(item)} style={{ width: 28, height: 28, borderRadius: '50%', background: t.accent, border: 'none', color: getContrastColor(t.accent), cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
                       </div>
                     )}
                   </div>
@@ -125,8 +134,7 @@ function Theme1({ menu, onAdd, cart, restaurant }) {
   );
 }
 
-function Theme2({ menu, onAdd, cart, restaurant }) {
-  const t = THEMES[2];
+function Theme2({ menu, onAdd, cart, restaurant, theme: t }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
@@ -134,13 +142,13 @@ function Theme2({ menu, onAdd, cart, restaurant }) {
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
       <div style={{ position: 'relative', background: `linear-gradient(135deg, ${t.accent}20, ${t.accent2}15)`, padding: '120px 24px 100px', textAlign: 'center', borderBottom: `1px solid ${t.border}` }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: t.accent, color: '#fff', fontSize: 11, fontWeight: 800, padding: '6px 18px', borderRadius: 99, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 24 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: t.accent, color: getContrastColor(t.accent), fontSize: 11, fontWeight: 800, padding: '6px 18px', borderRadius: 99, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 24 }}>
           Coffee & Lounge
         </span>
         <h1 style={{ fontSize: 'clamp(36px,7vw,72px)', fontWeight: 800, color: t.text, marginBottom: 18, lineHeight: 1.1 }}>{restaurant.name}</h1>
         <p style={{ color: t.muted, fontSize: 18, marginBottom: 44, maxWidth: 520, margin: '0 auto 44px', lineHeight: 1.6 }}>{restaurant.tagline}</p>
         <button onClick={() => document.getElementById('menu-section2')?.scrollIntoView({ behavior: 'smooth' })}
-          style={{ background: t.accent, color: '#fff', border: 'none', padding: '18px 48px', borderRadius: 99, fontSize: 16, fontWeight: 700, boxShadow: `0 10px 30px ${t.accent}44`, transition: 'all .2s', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 12 }}
+          style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '18px 48px', borderRadius: 99, fontSize: 16, fontWeight: 700, boxShadow: `0 10px 30px ${t.accent}44`, transition: 'all .2s', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 12 }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 15px 40px ${t.accent}55`; }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 10px 30px ${t.accent}44`; }}>
           Explorer le Lounge <ArrowRight size={20} />
@@ -151,7 +159,7 @@ function Theme2({ menu, onAdd, cart, restaurant }) {
         {cats.map(cat => (
           <button key={cat} onClick={() => setActiveCat(cat)}
             style={{ padding: '12px 28px', borderRadius: 99, border: `2px solid ${activeCat === cat ? t.accent : t.border}`,
-              background: activeCat === cat ? t.accent : 'white', color: activeCat === cat ? '#fff' : t.muted,
+              background: activeCat === cat ? t.accent : 'white', color: activeCat === cat ? getContrastColor(t.accent) : t.muted,
               fontFamily: t.font, fontSize: 14, fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all .2s' }}>
             {cat}
           </button>
@@ -180,14 +188,14 @@ function Theme2({ menu, onAdd, cart, restaurant }) {
                   <span style={{ color: t.accent, fontWeight: 900, fontSize: 20 }}>{fmt(item.price)}</span>
                   {qty === 0 ? (
                     <button onClick={() => onAdd(item)}
-                      style={{ background: t.accent, color: '#fff', border: 'none', padding: '12px 28px', borderRadius: 99, fontSize: 14, fontWeight: 800, transition: 'all .2s', cursor: 'pointer' }}
+                      style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '12px 28px', borderRadius: 99, fontSize: 14, fontWeight: 800, transition: 'all .2s', cursor: 'pointer' }}
                       onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
                       onMouseLeave={e => e.currentTarget.style.transform = ''}>Ajouter</button>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <button onClick={() => cart.remove(item.id)} style={{ width: 36, height: 36, borderRadius: '50%', border: `2px solid ${t.accent}`, background: 'white', color: t.accent, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={18} /></button>
                       <span style={{ fontWeight: 900, color: t.accent, minWidth: 24, textAlign: 'center', fontSize: 16 }}>{qty}</span>
-                      <button onClick={() => onAdd(item)} style={{ width: 36, height: 36, borderRadius: '50%', background: t.accent, border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={18} /></button>
+                      <button onClick={() => onAdd(item)} style={{ width: 36, height: 36, borderRadius: '50%', background: t.accent, border: 'none', color: getContrastColor(t.accent), cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={18} /></button>
                     </div>
                   )}
                 </div>
@@ -201,8 +209,7 @@ function Theme2({ menu, onAdd, cart, restaurant }) {
   );
 }
 
-function Theme3({ menu, onAdd, cart, restaurant }) {
-  const t = THEMES[3];
+function Theme3({ menu, onAdd, cart, restaurant, theme: t }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
@@ -216,7 +223,7 @@ function Theme3({ menu, onAdd, cart, restaurant }) {
         <h1 style={{ fontSize: 'clamp(38px,7vw,80px)', fontWeight: 900, marginBottom: 16, color: t.accent }}>{restaurant.name}</h1>
         <p style={{ fontSize: 18, opacity: .75, marginBottom: 40 }}>{restaurant.tagline}</p>
         <button onClick={() => document.getElementById('menu-section3')?.scrollIntoView({ behavior: 'smooth' })}
-          style={{ background: t.accent, color: '#fff', border: 'none', padding: '15px 44px', fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}
+          style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '15px 44px', fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}
           onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
           onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}>
           Notre Carte
@@ -253,12 +260,12 @@ function Theme3({ menu, onAdd, cart, restaurant }) {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: 900, fontSize: 20, color: t.accent }}>{fmt(item.price)}</span>
                     {qty === 0 ? (
-                      <button onClick={() => onAdd(item)} style={{ background: t.accent, color: '#fff', border: 'none', padding: '10px 24px', fontSize: 13, fontWeight: 800, letterSpacing: 1, cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}>AJOUTER</button>
+                      <button onClick={() => onAdd(item)} style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '10px 24px', fontSize: 13, fontWeight: 800, letterSpacing: 1, cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}>AJOUTER</button>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <button onClick={() => cart.remove(item.id)} style={{ width: 32, height: 32, border: `1px solid ${t.border}`, background: 'white', cursor: 'pointer', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={16} /></button>
                         <span style={{ fontWeight: 800, color: t.accent, minWidth: 20, textAlign: 'center', fontSize: 16 }}>{qty}</span>
-                        <button onClick={() => onAdd(item)} style={{ width: 32, height: 32, background: t.accent, border: 'none', color: 'white', cursor: 'pointer', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={16} /></button>
+                        <button onClick={() => onAdd(item)} style={{ width: 32, height: 32, background: t.accent, border: 'none', color: getContrastColor(t.accent), cursor: 'pointer', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={16} /></button>
                       </div>
                     )}
                   </div>
@@ -273,8 +280,7 @@ function Theme3({ menu, onAdd, cart, restaurant }) {
   );
 }
 
-function Theme4({ menu, onAdd, cart, restaurant }) {
-  const t = THEMES[4];
+function Theme4({ menu, onAdd, cart, restaurant, theme: t }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
@@ -288,7 +294,7 @@ function Theme4({ menu, onAdd, cart, restaurant }) {
         <h1 style={{ fontSize: 'clamp(36px, 8vw, 64px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: t.text }}>{restaurant.name}</h1>
         <p style={{ color: t.muted, fontSize: 17, marginBottom: 40 }}>{restaurant.tagline}</p>
         <button onClick={() => document.getElementById('menu-section4')?.scrollIntoView({ behavior: 'smooth' })}
-          style={{ background: t.accent, color: '#ffffff', border: 'none', padding: '18px 48px', borderRadius: t.cardRadius, fontSize: 15, fontWeight: 900, cursor: 'pointer', transition: 'all .2s' }}>
+          style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '18px 48px', borderRadius: t.cardRadius, fontSize: 15, fontWeight: 900, cursor: 'pointer', transition: 'all .2s' }}>
           Commander sur place <ArrowRight size={20} />
         </button>
       </div>
@@ -298,7 +304,7 @@ function Theme4({ menu, onAdd, cart, restaurant }) {
           {cats.map(cat => (
             <button key={cat} onClick={() => setActiveCat(cat)}
               style={{ padding: '12px 28px', background: activeCat === cat ? t.accent : t.card,
-                border: `2px solid ${activeCat === cat ? 'transparent' : t.border}`, color: activeCat === cat ? '#fff' : t.muted,
+                border: `2px solid ${activeCat === cat ? 'transparent' : t.border}`, color: activeCat === cat ? getContrastColor(t.accent) : t.muted,
                 fontFamily: t.font, fontSize: 13, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', whiteSpace: 'nowrap', cursor: 'pointer',
                 borderRadius: t.cardRadius, transition: 'all .2s' }}>
               {cat}
@@ -321,14 +327,14 @@ function Theme4({ menu, onAdd, cart, restaurant }) {
                     <span style={{ fontWeight: 900, fontSize: 22, color: t.accent }}>{fmt(item.price)}</span>
                     {qty === 0 ? (
                       <button onClick={() => onAdd(item)}
-                        style={{ background: t.accent, color: '#fff', border: 'none', padding: '10px 24px', borderRadius: t.cardRadius, fontSize: 13, fontWeight: 900, cursor: 'pointer' }}>
+                        style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '10px 24px', borderRadius: t.cardRadius, fontSize: 13, fontWeight: 900, cursor: 'pointer' }}>
                         + Ajouter
                       </button>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: t.bg, borderRadius: t.cardRadius, padding: '4px' }}>
                         <button onClick={() => cart.remove(item.id)} style={{ width: 32, height: 32, background: 'transparent', border: 'none', color: t.text, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={18} /></button>
                         <span style={{ color: t.accent, fontWeight: 900, minWidth: 20, textAlign: 'center', fontSize: 16 }}>{qty}</span>
-                        <button onClick={() => onAdd(item)} style={{ width: 32, height: 32, background: t.accent, border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={18} /></button>
+                        <button onClick={() => onAdd(item)} style={{ width: 32, height: 32, background: t.accent, border: 'none', color: getContrastColor(t.accent), cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={18} /></button>
                       </div>
                     )}
                   </div>
@@ -343,8 +349,7 @@ function Theme4({ menu, onAdd, cart, restaurant }) {
   );
 }
 
-function Theme5({ menu, onAdd, cart, restaurant }) {
-  const t = THEMES[5];
+function Theme5({ menu, onAdd, cart, restaurant, theme: t }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
@@ -464,9 +469,10 @@ function Theme5({ menu, onAdd, cart, restaurant }) {
   );
 }
 
-export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveTheme, restaurant }) {
+export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveTheme, restaurant, customThemeColors }) {
   const [showSwitcher, setShowSwitcher] = useState(false);
   const t = THEMES[activeTheme];
+  const adjustedTheme = { ...t, accent: customThemeColors[activeTheme] || t.accent };
   const COMPONENTS = { 1: Theme1, 2: Theme2, 3: Theme3, 4: Theme4, 5: Theme5 };
   const ActiveTheme = COMPONENTS[activeTheme];
 
@@ -481,10 +487,10 @@ export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveT
           .theme5-cart-container { justify-content: flex-end !important; }
         }
       `}</style>
-      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} />
+      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} theme={adjustedTheme} />
       <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 100 }}>
         <button onClick={() => setShowSwitcher(!showSwitcher)}
-          style={{ width: 50, height: 50, borderRadius: '50%', background: t.accent, border: 'none', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>
+          style={{ width: 50, height: 50, borderRadius: '50%', background: adjustedTheme.accent, border: 'none', color: getContrastColor(adjustedTheme.accent), display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>
           <Palette />
         </button>
         {showSwitcher && (

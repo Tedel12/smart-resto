@@ -10,7 +10,7 @@ const fmt = (n) => {
 };
 
 
-export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode, restaurant, setRestaurant, showToast }) {
+export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode, restaurant, setRestaurant, showToast, customThemeColors, setCustomThemeColors }) {
   const t = THEMES[activeTheme];
   const D = isDarkMode ? D_DARK : D_LIGHT;
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -174,11 +174,19 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                               {it.qty}× {it.name}
                             </span>
                           ))}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
                           {order.comment && (
-                              <div style={{ background: D.gold + '22', color: D.gold, fontSize: 12, padding: '4px 12px', borderRadius: 99, border: `1px solid ${D.gold}44`, marginTop: 5, width: '100%' }}>
+                              <div style={{ background: D.gold + '22', color: D.gold, fontSize: 12, padding: '4px 12px', borderRadius: 99, border: `1px solid ${D.gold}44` }}>
                                   Note: {order.comment}
                               </div>
                           )}
+                          <div style={{ fontSize: 12, color: D.muted }}>Paiement: {order.paymentMethod}</div>
+                          {order.paymentMethod !== 'Cash' && order.status === 'en attente' && (
+                              <button onClick={() => updateStatus(order.id, 'servi')} style={{ background: D.green, color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+                                  Marquer comme Payé
+                              </button>
+                          )}
+                        </div>
                         </div>
                       </div>
                     ))}
@@ -253,7 +261,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
                 {Object.values(THEMES).map(th => (
                   <div key={th.id} onClick={() => setActiveTheme(th.id)}
-                    style={{ background: th.card, border: `3px solid ${activeTheme === th.id ? th.accent : D.border}`, borderRadius: 14, padding: 20, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    style={{ background: th.card, border: `3px solid ${activeTheme === th.id ? (customThemeColors[th.id] || th.accent) : D.border}`, borderRadius: 14, padding: 20, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 10 }}>
                     <div style={{ fontSize: 40 }}>{th.preview.split(' ')[0]}</div>
                     <div>
                       <div style={{ color: th.text, fontWeight: 700 }}>{th.name}</div>
@@ -262,6 +270,18 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                   </div>
                 ))}
               </div>
+              
+              {[2, 3, 4].includes(activeTheme) && (
+                  <div style={{ marginTop: 30 }}>
+                    <h3 style={s.sectionTitle}>Couleur du template</h3>
+                    <div style={{ display: 'flex', gap: 10 }}>
+                        {['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF33A8', '#33FFF6'].map(color => (
+                            <button key={color} onClick={() => setCustomThemeColors(prev => ({ ...prev, [activeTheme]: color }))}
+                                style={{ width: 40, height: 40, borderRadius: '50%', background: color, border: customThemeColors[activeTheme] === color ? '3px solid #fff' : 'none', cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }} />
+                        ))}
+                    </div>
+                  </div>
+              )}
             </div>
           )}
           {tab === 'footer' && (

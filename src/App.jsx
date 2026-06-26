@@ -51,6 +51,23 @@ export default function App() {
     }
   });
 
+  const [customThemeColors, setCustomThemeColors] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sr_custom_colors');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sr_custom_colors', JSON.stringify(customThemeColors));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [customThemeColors]);
+
   useEffect(() => {
     try {
       localStorage.setItem('sr_restaurant', JSON.stringify(restaurant));
@@ -76,12 +93,18 @@ export default function App() {
     }
   }, [menu]);
 
-  const currentTheme = THEMES[activeTheme];
-
-  const getAccentBtnText = (themeId) => {
-    if (themeId === 2 || themeId === 3 || themeId === 5) return '#fff';
-    return '#000';
+  const getContrastColor = (hexColor) => {
+    if (!hexColor) return '#fff';
+    const r = parseInt(hexColor.slice(1, 3), 16);
+    const g = parseInt(hexColor.slice(3, 5), 16);
+    const b = parseInt(hexColor.slice(5, 7), 16);
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? '#000' : '#fff';
   };
+
+  const currentTheme = THEMES[activeTheme];
+  const accent = customThemeColors[activeTheme] || currentTheme.accent;
+  const accentText = getContrastColor(accent);
 
   const showToast = (msg, color = D.green) => {
     setToast({ msg, color });
@@ -93,9 +116,9 @@ export default function App() {
     showToast(<><Check size={16} /> {item.name} ajouté</>, D.green);
   };
 
-  const handleCheckout = (comment) => {
+  const handleCheckout = (comment, paymentMethod) => {
     if (cart.items.length === 0) return;
-    addOrder({ table: RESTAURANT.table, items: cart.items, comment });
+    addOrder({ table: RESTAURANT.table, items: cart.items, comment, paymentMethod });
     cart.clear();
     setShowCart(false);
     showToast(<><PartyPopper size={16} /> Commande envoyée en cuisine !</>, D.gold);
@@ -104,8 +127,6 @@ export default function App() {
   const isLightTheme = currentTheme.bg === '#FFFFFF' || currentTheme.bg === '#FAF8F3' || currentTheme.bg === '#FFFBF5';
   const navBg = isLightTheme ? 'rgba(250, 248, 243, 0.94)' : 'rgba(10, 12, 15, 0.94)';
   const navBorder = currentTheme.border;
-  const navText = currentTheme.text;
-  const navLogoColor = currentTheme.accent;
 
   return (
     <div style={{ fontFamily: currentTheme.font }}>
@@ -116,17 +137,17 @@ export default function App() {
         borderBottom: `1px solid ${navBorder}`, display: 'flex', alignItems: 'center',
         justifyContent: 'space-between', padding: '0 12px', height: 56, transition: 'all 0.3s' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ color: navLogoColor, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ color: accent, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Trees size={18} /> {restaurant.name}
           </span>
           <div style={{ width: 1, height: 20, background: navBorder }} />
           <button onClick={() => setView('landing')}
-            style={{ background: view === 'landing' ? `${currentTheme.accent}22` : 'none', color: view === 'landing' ? currentTheme.accent : currentTheme.muted,
+            style={{ background: view === 'landing' ? `${accent}22` : 'none', color: view === 'landing' ? accent : currentTheme.muted,
               border: 'none', padding: '6px 8px', borderRadius: 8, fontFamily: currentTheme.font, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, transition: 'all 0.2s' }}>
             <Globe size={14} /> Vitrine
           </button>
           <button onClick={() => setView('dashboard')}
-            style={{ background: view === 'dashboard' ? `${currentTheme.accent}22` : 'none', color: view === 'dashboard' ? currentTheme.accent : currentTheme.muted,
+            style={{ background: view === 'dashboard' ? `${accent}22` : 'none', color: view === 'dashboard' ? accent : currentTheme.muted,
               border: 'none', padding: '6px 8px', borderRadius: 8, fontFamily: currentTheme.font, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, transition: 'all 0.2s' }}>
             <Settings size={14} /> Admin
           </button>
@@ -135,8 +156,8 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ color: currentTheme.muted, fontSize: 12 }}>{restaurant.table}</span>
           {view === 'landing' && (
-            <button onClick={() => setShowCart(true)} style={{ position: 'relative', background: currentTheme.accent, border: 'none',
-              color: getAccentBtnText(activeTheme), padding: '8px 18px', borderRadius: 99, fontFamily: currentTheme.font, fontSize: 13, fontWeight: 800, cursor: 'pointer',
+            <button onClick={() => setShowCart(true)} style={{ position: 'relative', background: accent, border: 'none',
+              color: accentText, padding: '8px 18px', borderRadius: 99, fontFamily: currentTheme.font, fontSize: 13, fontWeight: 800, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 8, transition: 'transform .15s' }}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
@@ -155,15 +176,15 @@ export default function App() {
       {/* ── Content (with top padding for nav) ── */}
       <div style={{ paddingTop: 56 }}>
         {view === 'landing' ? (
-          <LandingPage menu={menu} cart={cart} onAdd={handleAdd} activeTheme={activeTheme} setActiveTheme={setActiveTheme} restaurant={restaurant} />
+          <LandingPage menu={menu} cart={cart} onAdd={handleAdd} activeTheme={activeTheme} setActiveTheme={setActiveTheme} restaurant={restaurant} customThemeColors={customThemeColors} />
         ) : (
-          <Dashboard menu={menu} setMenu={setMenu} orders={orders} updateStatus={updateStatus} deleteOrder={deleteOrder} activeTheme={activeTheme} setActiveTheme={setActiveTheme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} restaurant={restaurant} setRestaurant={setRestaurant} showToast={showToast} />
+          <Dashboard menu={menu} setMenu={setMenu} orders={orders} updateStatus={updateStatus} deleteOrder={deleteOrder} activeTheme={activeTheme} setActiveTheme={setActiveTheme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} restaurant={restaurant} setRestaurant={setRestaurant} showToast={showToast} customThemeColors={customThemeColors} setCustomThemeColors={setCustomThemeColors} />
         )}
       </div>
 
       {/* ── Cart Sidebar ── */}
       {showCart && (
-        <CartSidebar cart={cart} onClose={() => setShowCart(false)} onCheckout={handleCheckout} theme={currentTheme} />
+        <CartSidebar cart={cart} onClose={() => setShowCart(false)} onCheckout={handleCheckout} theme={currentTheme} activeTheme={activeTheme} customThemeColors={customThemeColors} />
       )}
 
       {/* ── Toast notification ── */}

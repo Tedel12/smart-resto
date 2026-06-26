@@ -2,9 +2,22 @@ import React, { useState } from 'react';
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
-export default function CartSidebar({ cart, onClose, onCheckout, theme }) {
+// Utility to determine if a color is light or dark to return black or white text
+const getContrastColor = (hexColor) => {
+  if (!hexColor) return '#fff';
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return (yiq >= 128) ? '#000' : '#fff';
+};
+
+export default function CartSidebar({ cart, onClose, onCheckout, theme, activeTheme, customThemeColors }) {
   const { items, remove, total } = cart;
   const [comment, setComment] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const accent = customThemeColors[activeTheme] || theme.accent;
+  const textColor = getContrastColor(accent);
 
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, fontFamily: theme.bodyFont || theme.font }}>
@@ -39,10 +52,10 @@ export default function CartSidebar({ cart, onClose, onCheckout, theme }) {
               <img src={item.img} alt={item.name} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
                 <div style={{ color: theme.text, fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{item.name}</div>
-                <div style={{ color: theme.accent, fontWeight: 700, fontSize: 13 }}>{fmt(item.price)}</div>
+                <div style={{ color: accent, fontWeight: 700, fontSize: 13 }}>{fmt(item.price)}</div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                <button onClick={() => cart.add(item)} style={{ width: 26, height: 26, borderRadius: '50%', background: theme.accent, border: 'none', color: '#fff', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                <button onClick={() => cart.add(item)} style={{ width: 26, height: 26, borderRadius: '50%', background: accent, border: 'none', color: textColor, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
                 <span style={{ color: theme.text, fontWeight: 700, fontSize: 15 }}>{item.qty}</span>
                 <button onClick={() => remove(item.id)} style={{ width: 26, height: 26, borderRadius: '50%', background: theme.bg, border: `1px solid ${theme.border}`, color: theme.muted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
               </div>
@@ -59,6 +72,14 @@ export default function CartSidebar({ cart, onClose, onCheckout, theme }) {
                 onChange={(e) => setComment(e.target.value)}
                 style={{ width: '100%', padding: '10px', marginBottom: 15, background: theme.bg, border: `1px solid ${theme.border}`, borderRadius: 8, color: theme.text, fontFamily: theme.bodyFont || theme.font, resize: 'none' }}
             />
+            <div style={{ marginBottom: 15 }}>
+                <label style={{ color: theme.muted, fontSize: 12, marginBottom: 5, display: 'block' }}>Moyen de paiement</label>
+                <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} style={{ width: '100%', padding: '10px', background: theme.bg, border: `1px solid ${theme.border}`, borderRadius: 8, color: theme.text, fontFamily: theme.bodyFont || theme.font }}>
+                    <option value="Cash">Cash</option>
+                    <option value="Carte Bancaire">Carte Bancaire</option>
+                    <option value="Mobile Money">Mobile Money</option>
+                </select>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
               <span style={{ color: theme.muted, fontSize: 13 }}>Sous-total</span>
               <span style={{ color: theme.text, fontWeight: 600 }}>{fmt(total)}</span>
@@ -69,11 +90,11 @@ export default function CartSidebar({ cart, onClose, onCheckout, theme }) {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20, paddingTop: 12, borderTop: `1px solid ${theme.border}` }}>
               <span style={{ color: theme.text, fontWeight: 700, fontSize: 16 }}>Total</span>
-              <span style={{ color: theme.accent, fontWeight: 800, fontSize: 20 }}>{fmt(Math.round(total * 1.05))}</span>
+              <span style={{ color: accent, fontWeight: 800, fontSize: 20 }}>{fmt(Math.round(total * 1.05))}</span>
             </div>
-            <button onClick={() => onCheckout(comment)}
-              style={{ width: '100%', padding: '15px', background: theme.accent, border: 'none', borderRadius: 10,
-                color: '#fff', fontWeight: 800, fontSize: 16, cursor: 'pointer', fontFamily: theme.bodyFont || theme.font,
+            <button onClick={() => onCheckout(comment, paymentMethod)}
+              style={{ width: '100%', padding: '15px', background: accent, border: 'none', borderRadius: 10,
+                color: textColor, fontWeight: 800, fontSize: 16, cursor: 'pointer', fontFamily: theme.bodyFont || theme.font,
                 transition: 'transform .15s, box-shadow .15s' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.02)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
