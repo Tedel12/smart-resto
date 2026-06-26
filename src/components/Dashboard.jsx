@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { D_DARK, D_LIGHT, dFont, THEMES, RESTAURANT } from '../data/index.js';
-import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, CreditCard, Banknote, Menu, Mail, Phone, MapPin } from 'lucide-react';
-import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, Menu, X, MapPin } from 'lucide-react';
 import { useMediaQuery } from '../hooks/index.js';
 
 const fmt = (n) => {
@@ -9,10 +8,10 @@ const fmt = (n) => {
   return (isNaN(value) ? 0 : value).toLocaleString('fr-FR') + ' FCFA';
 };
 
-
 export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode, restaurant, setRestaurant, showToast, customThemeColors, setCustomThemeColors }) {
   const t = THEMES[activeTheme];
   const D = isDarkMode ? D_DARK : D_LIGHT;
+  const accent = customThemeColors[activeTheme] || t.accent || D.gold;
   const isMobile = useMediaQuery('(max-width: 768px)');
   
   const [tab, setTab] = useState('orders');
@@ -92,7 +91,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
         position: isMobile ? 'absolute' : 'static', height: '100%', zIndex: 150, transform: isMobile && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform .3s' }}>
         <div style={{ padding: '24px 20px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isMobile ? 60 : 0 }}>
           <div>
-            <div style={{ color: t.accent || D.gold, fontSize: 16, fontWeight: 800 }}>{RESTAURANT.name}</div>
+            <div style={{ color: accent, fontSize: 16, fontWeight: 800 }}>{RESTAURANT.name}</div>
             <div style={{ color: D.muted, fontSize: 11 }}>Admin</div>
           </div>
           <button onClick={() => setIsDarkMode(!isDarkMode)} style={{ background: D.bg, border: 'none', borderRadius: 8, padding: 8, cursor: 'pointer', color: D.text }}>
@@ -111,10 +110,10 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
           ].map(tabItem => (
             <button key={tabItem.id} onClick={() => { setTab(tabItem.id); setIsSidebarOpen(false); }}
               style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px',
-                background: tab === tabItem.id ? `${t.accent || D.gold}18` : 'transparent', border: 'none', borderRadius: 10,
-                color: tab === tabItem.id ? (t.accent || D.gold) : D.muted, fontFamily: dFont, fontSize: 13, fontWeight: tab === tabItem.id ? 700 : 400,
+                background: tab === tabItem.id ? `${accent}18` : 'transparent', border: 'none', borderRadius: 10,
+                color: tab === tabItem.id ? accent : D.muted, fontFamily: dFont, fontSize: 13, fontWeight: tab === tabItem.id ? 700 : 400,
                 cursor: 'pointer', marginBottom: 4, textAlign: 'left', transition: 'all .15s',
-                borderLeft: `3px solid ${tab === tabItem.id ? (t.accent || D.gold) : 'transparent'}`, gap: 10 }}>
+                borderLeft: `3px solid ${tab === tabItem.id ? accent : 'transparent'}`, gap: 10 }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><tabItem.icon size={16} /> {tabItem.label}</span>
               {tabItem.count > 0 && <span style={{ background: D.red, color: '#fff', borderRadius: 99, fontSize: 11, fontWeight: 800, padding: '1px 7px' }}>{tabItem.count}</span>}
             </button>
@@ -241,7 +240,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
 
               {Object.entries(menu).map(([cat, items]) => (
                 <div key={cat} style={{ marginBottom: 32 }}>
-                  <div style={{ color: D.gold, fontSize: 13, fontWeight: 700, marginBottom: 12 }}>{cat}</div>
+                  <div style={{ color: accent, fontSize: 13, fontWeight: 700, marginBottom: 12 }}>{cat}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {(items || []).map(item => (
                       <div key={item.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -288,7 +287,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <h2 style={s.sectionTitle}>Personnalisation Footer</h2>
-                <button onClick={saveConfig} style={{ background: D.gold, color: isDarkMode ? '#000' : '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Enregistrer</button>
+                <button onClick={saveConfig} style={{ background: accent, color: isDarkMode ? '#000' : '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Enregistrer</button>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                 <div style={{ background: D.card, padding: 20, borderRadius: 12 }}>
@@ -430,7 +429,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                     });
                   }
                   setEditItem(null);
-                }} style={{ background: D.gold, border: 'none', borderRadius: 8, padding: '10px 20px', color: isDarkMode ? '#000' : '#fff', cursor: 'pointer', fontFamily: dFont, fontSize: 13, fontWeight: 800 }}>Enregistrer</button>
+                }} style={{ background: accent, border: 'none', borderRadius: 8, padding: '10px 20px', color: isDarkMode ? '#000' : '#fff', cursor: 'pointer', fontFamily: dFont, fontSize: 13, fontWeight: 800 }}>Enregistrer</button>
               </div>
             </div>
           </div>
