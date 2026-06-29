@@ -87,7 +87,7 @@ export function useOrders() {
     setOrders(prev => prev.filter(o => o.id !== id));
   }, []);
 
-  // LE RETURN SÉCURISÉ REQUIS PAR APP.JSX
+  
   return { orders, updateStatus, addOrder, deleteOrder };
 }
 

@@ -28,7 +28,7 @@ const Badge = ({ label, accent, accent2 }) => {
   );
 };
 
-function Theme1({ menu, onAdd, cart, restaurant, theme: t }) {
+function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const [items, setItems] = useState(menu[activeCat]);
@@ -95,14 +95,14 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t }) {
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.boxShadow = `0 20px 40px rgba(0,0,0,0.4), 0 0 20px ${t.accent}12`; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
                 <div style={{ height: 200, overflow: 'hidden', position: 'relative' }}>
-                  <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .6s' }}
+                  <img onClick={() => { setSelectedItem(item); setView('item-detail'); }} src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .6s', cursor: 'pointer' }}
                     onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
                     onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
                   {item.hot && <span style={{ position: 'absolute', top: 12, right: 12, background: '#FF4757', color: '#fff', fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 4, backdropFilter: 'blur(4px)' }}><Flame size={12} /> ÉPICÉ</span>}
                 </div>
                 <div style={{ padding: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, flex: 1, color: t.text }}>{item.name}</h3>
+                    <h3 onClick={() => { setSelectedItem(item); setView('item-detail'); }} style={{ fontSize: 16, fontWeight: 700, flex: 1, color: t.text, cursor: 'pointer' }}>{item.name}</h3>
                     <Badge label={item.badge} accent={t.accent} accent2={t.accent2} />
                   </div>
                   <p style={{ color: t.muted, fontSize: 13, marginBottom: 20, lineHeight: 1.6 }}>{item.desc}</p>
@@ -134,7 +134,7 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t }) {
   );
 }
 
-function Theme2({ menu, onAdd, cart, restaurant, theme: t }) {
+function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
@@ -175,14 +175,14 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t }) {
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.08)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.04)'; }}>
               <div style={{ position: 'relative', height: 220 }}>
-                <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img onClick={() => { setSelectedItem(item); setView('item-detail'); }} src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }} />
                 <div style={{ position: 'absolute', top: 12, left: 12, display: 'flex', gap: 8 }}>
                   {item.hot && <span style={{ background: '#FF6B6B', color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 12px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 4 }}><Flame size={14} /></span>}
                   <Badge label={item.badge} accent={t.accent} accent2={t.accent2} />
                 </div>
               </div>
               <div style={{ padding: '24px' }}>
-                <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: t.text }}>{item.name}</h3>
+                <h3 onClick={() => { setSelectedItem(item); setView('item-detail'); }} style={{ fontSize: 18, fontWeight: 800, marginBottom: 8, color: t.text, cursor: 'pointer' }}>{item.name}</h3>
                 <p style={{ color: t.muted, fontSize: 14, marginBottom: 24, lineHeight: 1.6 }}>{item.desc}</p>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ color: t.accent, fontWeight: 900, fontSize: 20 }}>{fmt(item.price)}</span>
@@ -209,7 +209,7 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t }) {
   );
 }
 
-function Theme3({ menu, onAdd, cart, restaurant, theme: t }) {
+function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
@@ -248,12 +248,12 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t }) {
             return (
               <div key={item.id} className="theme3-zigzag" style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '24px', background: t.card, borderRadius: t.cardRadius, border: `1px solid ${t.border}`, boxShadow: '0 8px 30px rgba(0,0,0,0.03)' }}>
                 <div style={{ height: 180, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
-                  <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img onClick={() => { setSelectedItem(item); setView('item-detail'); }} src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }} />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                      <span style={{ fontWeight: 800, fontSize: 18, color: t.text }}>{item.name}</span>
+                      <span onClick={() => { setSelectedItem(item); setView('item-detail'); }} style={{ fontWeight: 800, fontSize: 18, color: t.text, cursor: 'pointer' }}>{item.name}</span>
                     </div>
                     <p style={{ color: t.muted, fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>{item.desc}</p>
                   </div>
@@ -280,7 +280,7 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t }) {
   );
 }
 
-function Theme4({ menu, onAdd, cart, restaurant, theme: t }) {
+function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
@@ -318,10 +318,10 @@ function Theme4({ menu, onAdd, cart, restaurant, theme: t }) {
             return (
               <div key={item.id} style={{ background: t.card, border: `2px solid ${t.border}`, borderRadius: t.cardRadius, overflow: 'hidden', transition: 'all .3s', position: 'relative' }}>
                 <div style={{ position: 'relative', height: 180 }}>
-                  <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img onClick={() => { setSelectedItem(item); setView('item-detail'); }} src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }} />
                 </div>
                 <div style={{ padding: '20px' }}>
-                  <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 8, color: t.text }}>{item.name}</h3>
+                  <h3 onClick={() => { setSelectedItem(item); setView('item-detail'); }} style={{ fontSize: 18, fontWeight: 900, marginBottom: 8, color: t.text, cursor: 'pointer' }}>{item.name}</h3>
                   <p style={{ color: t.muted, fontSize: 13, marginBottom: 24, lineHeight: 1.5 }}>{item.desc}</p>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: 900, fontSize: 22, color: t.accent }}>{fmt(item.price)}</span>
@@ -349,7 +349,7 @@ function Theme4({ menu, onAdd, cart, restaurant, theme: t }) {
   );
 }
 
-function Theme5({ menu, onAdd, cart, restaurant, theme: t }) {
+function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
@@ -424,11 +424,11 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t }) {
                   borderBottom: isLast ? 'none' : `1px solid ${t.border}`, alignItems: 'center',
                   transition: 'all .3s' }}>
                 <div style={{ width: 140, height: 140, overflow: 'hidden', flexShrink: 0, borderRadius: 2 }}>
-                  <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .6s', filter: 'sepia(0.2) saturate(0.8)' }} />
+                  <img onClick={() => { setSelectedItem(item); setView('item-detail'); }} src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform .6s', filter: 'sepia(0.2) saturate(0.8)', cursor: 'pointer' }} />
                 </div>
                 <div className="theme5-info" style={{ flex: 1, textAlign: 'center' }}>
                   <div className="theme5-info-row" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 15, marginBottom: 12 }}>
-                    <h3 style={{ fontFamily: t.font, fontSize: 24, fontWeight: 500, color: t.text }}>{item.name}</h3>
+                    <h3 onClick={() => { setSelectedItem(item); setView('item-detail'); }} style={{ fontFamily: t.font, fontSize: 24, fontWeight: 500, color: t.text, cursor: 'pointer' }}>{item.name}</h3>
                     {item.hot && <span style={{ fontSize: 12, color: t.accent2, letterSpacing: 2, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6 }}><Flame size={14} /> Épicé</span>}
                   </div>
                   <p style={{ color: t.muted, fontSize: 15, lineHeight: 1.8, marginBottom: 16 }}>{item.desc}</p>
@@ -469,7 +469,7 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t }) {
   );
 }
 
-export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveTheme, restaurant, customThemeColors }) {
+export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveTheme, restaurant, customThemeColors, setSelectedItem, setView }) {
   const [showSwitcher, setShowSwitcher] = useState(false);
   const t = THEMES[activeTheme];
   const adjustedTheme = { ...t, accent: customThemeColors[activeTheme] || t.accent };
@@ -487,7 +487,7 @@ export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveT
           .theme5-cart-container { justify-content: flex-end !important; }
         }
       `}</style>
-      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} theme={adjustedTheme} />
+      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} theme={adjustedTheme} setSelectedItem={setSelectedItem} setView={setView} />
       <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 100 }}>
         <button onClick={() => setShowSwitcher(!showSwitcher)}
           style={{ width: 50, height: 50, borderRadius: '50%', background: adjustedTheme.accent, border: 'none', color: getContrastColor(adjustedTheme.accent), display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>

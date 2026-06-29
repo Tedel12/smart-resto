@@ -3,6 +3,7 @@ import { useCart, useOrders } from './hooks/index.js';
 import LandingPage from './components/LandingPage.jsx';
 import CartSidebar from './components/CartSidebar.jsx';
 import Dashboard from './components/Dashboard.jsx';
+import ItemDetail from './components/ItemDetail.jsx';
 import { D, dFont, RESTAURANT, THEMES, MENU } from './data/index.js';
 import { Trees, Globe, Settings, ShoppingCart, PartyPopper, Check } from 'lucide-react';
 
@@ -16,6 +17,8 @@ export default function App() {
       return 'landing';
     }
   });
+
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     try {
@@ -41,7 +44,7 @@ export default function App() {
       return MENU;
     }
   });
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [restaurant, setRestaurant] = useState(() => {
     try {
       const saved = localStorage.getItem('sr_restaurant');
@@ -176,7 +179,9 @@ export default function App() {
       {/* ── Content (with top padding for nav) ── */}
       <div style={{ paddingTop: 56 }}>
         {view === 'landing' ? (
-          <LandingPage menu={menu} cart={cart} onAdd={handleAdd} activeTheme={activeTheme} setActiveTheme={setActiveTheme} restaurant={restaurant} customThemeColors={customThemeColors} />
+          <LandingPage menu={menu} cart={cart} onAdd={handleAdd} activeTheme={activeTheme} setActiveTheme={setActiveTheme} restaurant={restaurant} customThemeColors={customThemeColors} setSelectedItem={setSelectedItem} setView={setView} />
+        ) : view === 'item-detail' ? (
+          <ItemDetail item={selectedItem} theme={{ ...currentTheme, accent: accent }} onAdd={handleAdd} onClose={() => setView('landing')} />
         ) : (
           <Dashboard menu={menu} setMenu={setMenu} orders={orders} updateStatus={updateStatus} deleteOrder={deleteOrder} activeTheme={activeTheme} setActiveTheme={setActiveTheme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} restaurant={restaurant} setRestaurant={setRestaurant} showToast={showToast} customThemeColors={customThemeColors} setCustomThemeColors={setCustomThemeColors} />
         )}
