@@ -17,9 +17,20 @@ const getContrastColor = (hexColor) => {
 };
 
 const getHero = (restaurant, activeTheme) => {
-  if (restaurant.hero && restaurant.hero[activeTheme]) return restaurant.hero[activeTheme];
-  if (restaurant.hero && restaurant.hero[1]) return restaurant.hero[1];
-  return DEFAULT_HERO;
+  const custom = (restaurant.hero && restaurant.hero[activeTheme]) ? restaurant.hero[activeTheme] : {};
+  const defaults = (RESTAURANT.heroDefaults && RESTAURANT.heroDefaults[activeTheme]) ? RESTAURANT.heroDefaults[activeTheme] : DEFAULT_HERO;
+  
+  // Merge, prioritizing custom values, but keeping defaults for missing custom fields
+  const merged = { ...defaults, ...custom };
+  
+  // Clean up empty strings or nulls, ensuring defaults are used if custom field is empty
+  Object.keys(merged).forEach(key => {
+    if (merged[key] === '' || merged[key] === null || merged[key] === undefined) {
+        merged[key] = defaults[key];
+    }
+  });
+
+  return merged;
 };
 
 const Badge = ({ label, accent, accent2 }) => {
@@ -301,16 +312,21 @@ function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
-      <div style={{ textAlign: 'center', padding: '100px 24px 80px', background: `linear-gradient(180deg, ${t.accent}15 0%, transparent 100%)`, borderBottom: `1px solid ${t.border}` }}>
-        <div style={{ fontSize: 12, letterSpacing: 8, color: t.accent, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontWeight: 800 }}>
-          {hero.title}
+      <div style={{ position: 'relative', textAlign: 'center', padding: '100px 24px 80px', borderBottom: `1px solid ${t.border}`, overflow: 'hidden' }}>
+        {hero.image && (
+            <div style={{ position: 'absolute', inset: 0, background: `url(${hero.image}) center/cover`, filter: 'brightness(0.3)' }} />
+        )}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ fontSize: 12, letterSpacing: 8, color: hero.color || t.accent, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontWeight: 800 }}>
+              {hero.title}
+            </div>
+            <h1 style={{ fontSize: `clamp(36px, 8vw, ${hero.fontSize || 64}px)`, fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: '#fff' }}>{hero.tagline}</h1>
+            <p style={{ color: '#eee', fontSize: 17, marginBottom: 40 }}>{hero.description}</p>
+            <button onClick={() => document.getElementById('menu-section4')?.scrollIntoView({ behavior: 'smooth' })}
+              style={{ background: hero.color || t.accent, color: getContrastColor(hero.color || t.accent), border: 'none', padding: '18px 48px', borderRadius: t.cardRadius, fontSize: 15, fontWeight: 900, cursor: 'pointer', transition: 'all .2s' }}>
+              Commander sur place <ArrowRight size={20} />
+            </button>
         </div>
-        <h1 style={{ fontSize: `clamp(36px, 8vw, ${hero.fontSize || 64}px)`, fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: t.text }}>{hero.tagline}</h1>
-        <p style={{ color: t.muted, fontSize: 17, marginBottom: 40 }}>{hero.description}</p>
-        <button onClick={() => document.getElementById('menu-section4')?.scrollIntoView({ behavior: 'smooth' })}
-          style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '18px 48px', borderRadius: t.cardRadius, fontSize: 15, fontWeight: 900, cursor: 'pointer', transition: 'all .2s' }}>
-          Commander sur place <ArrowRight size={20} />
-        </button>
       </div>
 
       <div id="menu-section4" style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 16px 80px' }}>
