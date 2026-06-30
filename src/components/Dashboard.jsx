@@ -19,7 +19,11 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
   const [selectedTable, setSelectedTable] = useState('Tous');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [newCat, setNewCat] = useState('');
-  const [draftRestaurant, setDraftRestaurant] = useState(restaurant);
+  const [draftRestaurant, setDraftRestaurant] = useState(() => structuredClone(restaurant));
+
+  React.useEffect(() => {
+    setDraftRestaurant(structuredClone(restaurant));
+  }, [restaurant]);
 
   const s = {
     sectionTitle: { color: D.text, fontSize: 18, fontWeight: 700, marginBottom: 20 },
@@ -41,7 +45,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
   };
 
   const saveConfig = () => {
-    setRestaurant(draftRestaurant);
+    setRestaurant(structuredClone(draftRestaurant));
     if (showToast) showToast('Configuration enregistrée !');
   };
 
@@ -106,6 +110,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
             { id: 'stats',  label: 'Statistiques', icon: BarChart3 },
             { id: 'menu',   label: 'Menu', icon: Utensils },
             { id: 'themes', label: 'Templates', icon: Palette },
+            { id: 'hero',   label: 'Configuration Hero', icon: ChefHat },
             { id: 'footer', label: 'Configuration Footer', icon: MapPin },
           ].map(tabItem => (
             <button key={tabItem.id} onClick={() => { setTab(tabItem.id); setIsSidebarOpen(false); }}
@@ -281,6 +286,57 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                     </div>
                   </div>
               )}
+            </div>
+          )}
+          {tab === 'hero' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <h2 style={s.sectionTitle}>Configuration Hero ({t.name})</h2>
+                <button onClick={saveConfig} style={{ background: accent, color: isDarkMode ? '#000' : '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Enregistrer</button>
+              </div>
+              <div style={{ background: D.card, padding: 20, borderRadius: 12 }}>
+                <label style={{ color: D.muted, fontSize: 12 }}>Titre</label>
+                <input value={draftRestaurant.hero[activeTheme]?.title || ''} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], title: e.target.value}}}))} style={{...s.input, marginBottom: 10}} />
+                
+                <label style={{ color: D.muted, fontSize: 12 }}>Tagline</label>
+                <input value={draftRestaurant.hero[activeTheme]?.tagline || ''} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], tagline: e.target.value}}}))} style={{...s.input, marginBottom: 10}} />
+
+                <label style={{ color: D.muted, fontSize: 12 }}>Description</label>
+                <textarea value={draftRestaurant.hero[activeTheme]?.description || ''} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], description: e.target.value}}}))} style={{...s.input, marginBottom: 10, minHeight: 60}} />
+
+                <label style={{ color: D.muted, fontSize: 12 }}>Image</label>
+                <input type="file" accept="image/*" onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], image: reader.result}}}));
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }} style={s.input} />
+                <input type="text" value={draftRestaurant.hero[activeTheme]?.image || ''} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], image: e.target.value}}}))} style={{...s.input, display: 'none'}} />
+                
+                <div style={{display: 'flex', gap: 20, marginTop: 10, flexWrap: 'wrap'}}>
+                    <div style={{flex: 1}}>
+                        <label style={{ color: D.muted, fontSize: 12 }}>Couleur d'accent</label>
+                        <input type="color" value={draftRestaurant.hero[activeTheme]?.color || '#F5A623'} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], color: e.target.value}}}))} style={{...s.input, padding: 5, height: 40}} />
+                    </div>
+                    <div style={{flex: 1}}>
+                        <label style={{ color: D.muted, fontSize: 12 }}>Police</label>
+                        <select value={draftRestaurant.hero[activeTheme]?.font || 'Sora'} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], font: e.target.value}}}))} style={{...s.input, height: 40}}>
+                            <option>Sora</option>
+                            <option>Inter</option>
+                            <option>Quicksand</option>
+                            <option>Cormorant Garamond</option>
+                        </select>
+                    </div>
+                    <div style={{flex: 1}}>
+                        <label style={{ color: D.muted, fontSize: 12 }}>Taille Titre (px)</label>
+                        <input type="number" value={draftRestaurant.hero[activeTheme]?.fontSize || 88} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], fontSize: e.target.value}}}))} style={{...s.input, height: 40}} />
+                    </div>
+                </div>
+              </div>
             </div>
           )}
           {tab === 'footer' && (

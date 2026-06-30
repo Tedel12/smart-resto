@@ -5,7 +5,8 @@ import Footer from './Footer.jsx';
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
-// Utility to determine if a color is light or dark to return black or white text
+const DEFAULT_HERO = { title: 'Le Baobab', tagline: 'Cuisine locale & internationale', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques.', image: '', color: '#F5A623', font: 'Sora', fontSize: 88 };
+
 const getContrastColor = (hexColor) => {
   if (!hexColor) return '#fff';
   const r = parseInt(hexColor.slice(1, 3), 16);
@@ -13,6 +14,12 @@ const getContrastColor = (hexColor) => {
   const b = parseInt(hexColor.slice(5, 7), 16);
   const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
   return (yiq >= 128) ? '#000' : '#fff';
+};
+
+const getHero = (restaurant, activeTheme) => {
+  if (restaurant.hero && restaurant.hero[activeTheme]) return restaurant.hero[activeTheme];
+  if (restaurant.hero && restaurant.hero[1]) return restaurant.hero[1];
+  return DEFAULT_HERO;
 };
 
 const Badge = ({ label, accent, accent2 }) => {
@@ -28,11 +35,12 @@ const Badge = ({ label, accent, accent2 }) => {
   );
 };
 
-function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
+function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const [items, setItems] = useState(menu[activeCat]);
   const [animating, setAnimating] = useState(false);
+  const hero = getHero(restaurant, activeTheme);
 
   React.useEffect(() => {
     setItems(menu[activeCat] || []);
@@ -45,22 +53,23 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
+    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
       <div style={{ position: 'relative', height: 520, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'url(https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80) center/cover', filter: 'brightness(.25)' }} />
-        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, ${t.accent}18 0%, transparent 70%)` }} />
-        <div style={{ position: 'relative', textAlign: 'center', padding: '0 24px' }}>
-          <div style={{ fontSize: 13, letterSpacing: 6, color: t.accent, marginBottom: 20, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+        <div style={{ position: 'absolute', inset: 0, background: `url(${hero.image}) center/cover`, filter: 'brightness(.25)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, ${hero.color || t.accent}18 0%, transparent 70%)` }} />
+        <div style={{ position: 'relative', textAlign: 'center', padding: '0 24px', fontFamily: hero.font || t.font }}>
+          <div style={{ fontSize: 13, letterSpacing: 6, color: hero.color || t.accent, marginBottom: 20, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
             <Star size={14} /> Restaurant gastronomique <Star size={14} />
           </div>
-          <h1 style={{ fontSize: 'clamp(42px,8vw,88px)', fontWeight: 800, lineHeight: 1, marginBottom: 16,
-            background: `linear-gradient(135deg, #fff 30%, ${t.accent})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            {restaurant.name}
+          <h1 style={{ fontSize: `clamp(42px, 8vw, ${hero.fontSize || 88}px)`, fontWeight: 800, lineHeight: 1, marginBottom: 16,
+            background: `linear-gradient(135deg, #fff 30%, ${hero.color || t.accent})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            {hero.title}
           </h1>
-          <p style={{ color: t.muted, fontSize: 17, marginBottom: 36 }}>{restaurant.tagline}</p>
+          <p style={{ color: t.muted, fontSize: 17, marginBottom: 16 }}>{hero.tagline}</p>
+          <p style={{ color: t.muted, fontSize: 15, marginBottom: 36, maxWidth: 600 }}>{hero.description}</p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
             <button onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })}
-              style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '14px 32px', borderRadius: 99,
+              style={{ background: hero.color || t.accent, color: getContrastColor(hero.color || t.accent), border: 'none', padding: '14px 32px', borderRadius: 99,
                 fontSize: 14, fontWeight: 700, letterSpacing: 1, transition: 'transform .15s', cursor: 'pointer' }}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.04)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
@@ -134,19 +143,20 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   );
 }
 
-function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
+function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
+  const hero = getHero(restaurant, activeTheme);
 
   return (
-    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
+    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
       <div style={{ position: 'relative', background: `linear-gradient(135deg, ${t.accent}20, ${t.accent2}15)`, padding: '120px 24px 100px', textAlign: 'center', borderBottom: `1px solid ${t.border}` }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: t.accent, color: getContrastColor(t.accent), fontSize: 11, fontWeight: 800, padding: '6px 18px', borderRadius: 99, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 24 }}>
-          Coffee & Lounge
+          {hero.title}
         </span>
-        <h1 style={{ fontSize: 'clamp(36px,7vw,72px)', fontWeight: 800, color: t.text, marginBottom: 18, lineHeight: 1.1 }}>{restaurant.name}</h1>
-        <p style={{ color: t.muted, fontSize: 18, marginBottom: 44, maxWidth: 520, margin: '0 auto 44px', lineHeight: 1.6 }}>{restaurant.tagline}</p>
+        <h1 style={{ fontSize: `clamp(36px, 7vw, ${hero.fontSize || 72}px)`, fontWeight: 800, color: t.text, marginBottom: 18, lineHeight: 1.1 }}>{hero.tagline}</h1>
+        <p style={{ color: t.muted, fontSize: 18, marginBottom: 44, maxWidth: 520, margin: '0 auto 44px', lineHeight: 1.6 }}>{hero.description}</p>
         <button onClick={() => document.getElementById('menu-section2')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '18px 48px', borderRadius: 99, fontSize: 16, fontWeight: 700, boxShadow: `0 10px 30px ${t.accent}44`, transition: 'all .2s', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 12 }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 15px 40px ${t.accent}55`; }}
@@ -154,6 +164,7 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           Explorer le Lounge <ArrowRight size={20} />
         </button>
       </div>
+
 
       <div id="menu-section2" style={{ overflowX: 'auto', display: 'flex', gap: 10, padding: '32px 16px', maxWidth: 1100, margin: '0 auto', scrollbarWidth: 'none' }}>
         {cats.map(cat => (
@@ -209,19 +220,20 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   );
 }
 
-function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
+function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
+  const hero = getHero(restaurant, activeTheme);
 
   return (
-    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
+    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
       <div style={{ background: `linear-gradient(135deg, ${t.accent}10, ${t.accent2}15)`, textAlign: 'center', padding: '100px 24px 80px', borderBottom: `4px solid ${t.border}` }}>
         <div style={{ fontSize: 12, letterSpacing: 5, textTransform: 'uppercase', marginBottom: 16, opacity: .8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-          <Leaf size={14} /> Pâtisseries & Délices <Leaf size={14} />
+          <Leaf size={14} /> {hero.title} <Leaf size={14} />
         </div>
-        <h1 style={{ fontSize: 'clamp(38px,7vw,80px)', fontWeight: 900, marginBottom: 16, color: t.accent }}>{restaurant.name}</h1>
-        <p style={{ fontSize: 18, opacity: .75, marginBottom: 40 }}>{restaurant.tagline}</p>
+        <h1 style={{ fontSize: `clamp(38px, 7vw, ${hero.fontSize || 80}px)`, fontWeight: 900, marginBottom: 16, color: t.accent }}>{hero.tagline}</h1>
+        <p style={{ fontSize: 18, opacity: .75, marginBottom: 40 }}>{hero.description}</p>
         <button onClick={() => document.getElementById('menu-section3')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '15px 44px', fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}
           onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
@@ -229,6 +241,7 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           Notre Carte
         </button>
       </div>
+
 
       <div id="menu-section3" style={{ maxWidth: 960, margin: '0 auto', padding: '60px 16px 80px' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 0, marginBottom: 50, borderBottom: `2px solid ${t.border}`, overflowX: 'auto', paddingBottom: 10 }}>
@@ -280,19 +293,20 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   );
 }
 
-function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
+function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
+  const hero = getHero(restaurant, activeTheme);
 
   return (
-    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.font }}>
+    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
       <div style={{ textAlign: 'center', padding: '100px 24px 80px', background: `linear-gradient(180deg, ${t.accent}15 0%, transparent 100%)`, borderBottom: `1px solid ${t.border}` }}>
         <div style={{ fontSize: 12, letterSpacing: 8, color: t.accent, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontWeight: 800 }}>
-          Menu Digital Table
+          {hero.title}
         </div>
-        <h1 style={{ fontSize: 'clamp(36px, 8vw, 64px)', fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: t.text }}>{restaurant.name}</h1>
-        <p style={{ color: t.muted, fontSize: 17, marginBottom: 40 }}>{restaurant.tagline}</p>
+        <h1 style={{ fontSize: `clamp(36px, 8vw, ${hero.fontSize || 64}px)`, fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: t.text }}>{hero.tagline}</h1>
+        <p style={{ color: t.muted, fontSize: 17, marginBottom: 40 }}>{hero.description}</p>
         <button onClick={() => document.getElementById('menu-section4')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '18px 48px', borderRadius: t.cardRadius, fontSize: 15, fontWeight: 900, cursor: 'pointer', transition: 'all .2s' }}>
           Commander sur place <ArrowRight size={20} />
@@ -349,27 +363,28 @@ function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   );
 }
 
-function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView }) {
+function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
+  const hero = getHero(restaurant, activeTheme);
 
   return (
-    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: t.bodyFont || 'Inter, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.bodyFont || 'Inter, sans-serif' }}>
       <div style={{ position: 'relative', height: 620, overflow: 'hidden' }}>
-        <img src="https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=1600&q=80"
+        <img src={hero.image}
           alt="hero" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(28,26,21,0.9) 30%, rgba(28,26,21,0.3) 100%)' }} />
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 80px', maxWidth: 700 }}>
-          <div style={{ fontFamily: t.font, fontSize: 13, letterSpacing: 8, color: t.accent2, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 12 }}>
-             <Palmtree size={18} /> Dakar · Cotonou · Abidjan
+          <div style={{ fontFamily: hero.font || t.font, fontSize: 13, letterSpacing: 8, color: t.accent2, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 12 }}>
+             <Palmtree size={18} /> {hero.tagline}
           </div>
-          <h1 style={{ fontFamily: t.font, fontSize: 'clamp(52px,8vw,96px)', fontWeight: 600, color: '#FAF8F3', lineHeight: 1.1, marginBottom: 24, fontStyle: 'italic' }}>
-            {restaurant.name}
+          <h1 style={{ fontFamily: hero.font || t.font, fontSize: `clamp(52px, 8vw, ${hero.fontSize || 96}px)`, fontWeight: 600, color: '#FAF8F3', lineHeight: 1.1, marginBottom: 24, fontStyle: 'italic' }}>
+            {hero.title}
           </h1>
           <div style={{ width: 60, height: 1, background: t.accent2, marginBottom: 32 }} />
           <p style={{ color: 'rgba(250,248,243,.8)', fontSize: 18, lineHeight: 1.8, marginBottom: 48, maxWidth: 450 }}>
-            Une expérience gastronomique qui célèbre les saveurs authentiques d'Afrique de l'Ouest dans un cadre d'exception.
+            {hero.description}
           </p>
           <button onClick={() => document.getElementById('menu-section5')?.scrollIntoView({ behavior: 'smooth' })}
             style={{ alignSelf: 'flex-start', background: 'transparent', color: '#FAF8F3', border: '1px solid rgba(250,248,243,.4)',
@@ -487,7 +502,7 @@ export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveT
           .theme5-cart-container { justify-content: flex-end !important; }
         }
       `}</style>
-      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} theme={adjustedTheme} setSelectedItem={setSelectedItem} setView={setView} />
+      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} theme={adjustedTheme} setSelectedItem={setSelectedItem} setView={setView} activeTheme={activeTheme} />
       <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 100 }}>
         <button onClick={() => setShowSwitcher(!showSwitcher)}
           style={{ width: 50, height: 50, borderRadius: '50%', background: adjustedTheme.accent, border: 'none', color: getContrastColor(adjustedTheme.accent), display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>

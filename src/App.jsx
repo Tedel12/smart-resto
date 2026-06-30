@@ -48,7 +48,7 @@ export default function App() {
   const [restaurant, setRestaurant] = useState(() => {
     try {
       const saved = localStorage.getItem('sr_restaurant');
-      return saved ? JSON.parse(saved) : RESTAURANT;
+      return saved ? { ...RESTAURANT, ...JSON.parse(saved) } : RESTAURANT;
     } catch (e) {
       return RESTAURANT;
     }

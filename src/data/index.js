@@ -1,6 +1,13 @@
 export const RESTAURANT = {
   name: 'Le Baobab',
   tagline: 'Cuisine locale & internationale',
+  hero: {
+    1: { title: 'Le Baobab', tagline: 'Cuisine locale & internationale', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques d\'Afrique de l\'Ouest.', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80', color: '#F5A623', font: 'Sora' },
+    2: { title: 'Le Baobab', tagline: 'Cuisine locale & internationale', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques d\'Afrique de l\'Ouest.', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80', color: '#A1887F', font: 'Inter' },
+    3: { title: 'Le Baobab', tagline: 'Cuisine locale & internationale', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques d\'Afrique de l\'Ouest.', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80', color: '#F06292', font: 'Quicksand' },
+    4: { title: 'Le Baobab', tagline: 'Cuisine locale & internationale', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques d\'Afrique de l\'Ouest.', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80', color: '#007AFF', font: 'SF Pro' },
+    5: { title: 'Le Baobab', tagline: 'Cuisine locale & internationale', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques d\'Afrique de l\'Ouest.', image: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=1600&q=80', color: '#3D5A40', font: 'Cormorant Garamond' },
+  },
   table: 'Table 7',
   logo: '',
   footer: {
