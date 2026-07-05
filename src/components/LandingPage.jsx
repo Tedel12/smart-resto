@@ -73,7 +73,7 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
             <Star size={14} /> Restaurant gastronomique <Star size={14} />
           </div>
           <h1 style={{ fontSize: `clamp(42px, 8vw, ${hero.fontSize || 88}px)`, fontWeight: 800, lineHeight: 1, marginBottom: 16,
-            background: `linear-gradient(135deg, #fff 30%, ${hero.color || t.accent})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            color: hero.color || t.accent }}>
             {hero.title}
           </h1>
           <p style={{ color: t.muted, fontSize: 17, marginBottom: 16 }}>{hero.tagline}</p>
@@ -166,7 +166,7 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: t.accent, color: getContrastColor(t.accent), fontSize: 11, fontWeight: 800, padding: '6px 18px', borderRadius: 99, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 24 }}>
           {hero.title}
         </span>
-        <h1 style={{ fontSize: `clamp(36px, 7vw, ${hero.fontSize || 72}px)`, fontWeight: 800, color: t.text, marginBottom: 18, lineHeight: 1.1 }}>{hero.tagline}</h1>
+        <h1 style={{ fontSize: `clamp(36px, 7vw, ${hero.fontSize || 72}px)`, fontWeight: 800, color: hero.color || t.accent, marginBottom: 18, lineHeight: 1.1 }}>{hero.tagline}</h1>
         <p style={{ color: t.muted, fontSize: 18, marginBottom: 44, maxWidth: 520, margin: '0 auto 44px', lineHeight: 1.6 }}>{hero.description}</p>
         <button onClick={() => document.getElementById('menu-section2')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '18px 48px', borderRadius: 99, fontSize: 16, fontWeight: 700, boxShadow: `0 10px 30px ${t.accent}44`, transition: 'all .2s', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 12 }}
@@ -243,7 +243,7 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
         <div style={{ fontSize: 12, letterSpacing: 5, textTransform: 'uppercase', marginBottom: 16, opacity: .8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <Leaf size={14} /> {hero.title} <Leaf size={14} />
         </div>
-        <h1 style={{ fontSize: `clamp(38px, 7vw, ${hero.fontSize || 80}px)`, fontWeight: 900, marginBottom: 16, color: t.accent }}>{hero.tagline}</h1>
+        <h1 style={{ fontSize: `clamp(38px, 7vw, ${hero.fontSize || 80}px)`, fontWeight: 900, marginBottom: 16, color: hero.color || t.accent }}>{hero.tagline}</h1>
         <p style={{ fontSize: 18, opacity: .75, marginBottom: 40 }}>{hero.description}</p>
         <button onClick={() => document.getElementById('menu-section3')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '15px 44px', fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}
@@ -320,7 +320,7 @@ function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
             <div style={{ fontSize: 12, letterSpacing: 8, color: hero.color || t.accent, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontWeight: 800 }}>
               {hero.title}
             </div>
-            <h1 style={{ fontSize: `clamp(36px, 8vw, ${hero.fontSize || 64}px)`, fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: '#fff' }}>{hero.tagline}</h1>
+            <h1 style={{ fontSize: `clamp(36px, 8vw, ${hero.fontSize || 64}px)`, fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: hero.color || t.accent }}>{hero.tagline}</h1>
             <p style={{ color: '#eee', fontSize: 17, marginBottom: 40 }}>{hero.description}</p>
             <button onClick={() => document.getElementById('menu-section4')?.scrollIntoView({ behavior: 'smooth' })}
               style={{ background: hero.color || t.accent, color: getContrastColor(hero.color || t.accent), border: 'none', padding: '18px 48px', borderRadius: t.cardRadius, fontSize: 15, fontWeight: 900, cursor: 'pointer', transition: 'all .2s' }}>
@@ -390,12 +390,12 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
       <div style={{ position: 'relative', height: 620, overflow: 'hidden' }}>
         <img src={hero.image}
           alt="hero" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(28,26,21,0.9) 30%, rgba(28,26,21,0.3) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(28,26,21,0.9) 30%, rgba(28,26,21,0.3) 100%)' }}></div>
         <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 80px', maxWidth: 700 }}>
           <div style={{ fontFamily: hero.font || t.font, fontSize: 13, letterSpacing: 8, color: t.accent2, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 12 }}>
              <Palmtree size={18} /> {hero.tagline}
           </div>
-          <h1 style={{ fontFamily: hero.font || t.font, fontSize: `clamp(52px, 8vw, ${hero.fontSize || 96}px)`, fontWeight: 600, color: '#FAF8F3', lineHeight: 1.1, marginBottom: 24, fontStyle: 'italic' }}>
+          <h1 style={{ fontFamily: hero.font || t.font, fontSize: `clamp(52px, 8vw, ${hero.fontSize || 96}px)`, fontWeight: 600, color: hero.color || '#FAF8F3', lineHeight: 1.1, marginBottom: 24, fontStyle: 'italic' }}>
             {hero.title}
           </h1>
           <div style={{ width: 60, height: 1, background: t.accent2, marginBottom: 32 }} />
