@@ -2,25 +2,39 @@ export const RESTAURANT = {
   name: 'Le Baobab',
   tagline: 'Cuisine locale & internationale',
   logo: '',
-  heroDefaults: {
-    1: { title: 'Le Baobab', tagline: 'Élégance culinaire', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques.', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80', color: '#F5A623', font: 'Sora', fontSize: 88 },
-    2: { title: 'Coffee Lounge', tagline: 'Détente & Café', description: 'Le lieu idéal pour vos pauses gourmandes et rendez-vous.', image: 'https://images.unsplash.com/photo-1559925393-8be07e767250?w=1600&q=80', color: '#A1887F', font: 'Inter', fontSize: 72 },
-    3: { title: 'Bakery Sweet', tagline: 'Douceurs du jour', description: 'Pâtisseries fraîches préparées avec passion chaque matin.', image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=1600&q=80', color: '#F06292', font: 'Quicksand', fontSize: 80 },
-    4: { title: 'Digital Menu', tagline: 'Rapide & Moderne', description: 'Commandez en quelques clics depuis votre table.', image: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=1600&q=80', color: '#007AFF', font: 'Inter', fontSize: 64 },
-    5: { title: 'Zen Africain', tagline: 'Cuisine du terroir', description: 'L\'authenticité de nos terres dans votre assiette.', image: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=1600&q=80', color: '#3D5A40', font: 'Cormorant Garamond', fontSize: 96 },
-  },
-  hero: {
-    1: {}, 2: {}, 3: {}, 4: {}, 5: {}
+  config: {
+    1: { 
+        hero: { title: 'Le Baobab', tagline: 'Élégance culinaire', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques.', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80', color: '#F5A623', font: 'Sora', fontSize: 88 },
+        footer: { address: 'Cotonou, Bénin', phone: '+229 00 00 00 00', email: 'contact@lebaobab.com', socials: { facebook: '#', instagram: '#' }, newsletterEnabled: true },
+        cta: { title: 'Envie de goûter ?', buttonText: 'Réserver une table', action: 'reserve' },
+        navLayout: 1
+    },
+    2: { 
+        hero: { title: 'Coffee Lounge', tagline: 'Détente & Café', description: 'Le lieu idéal pour vos pauses gourmandes et rendez-vous.', image: 'https://images.unsplash.com/photo-1559925393-8be07e767250?w=1600&q=80', color: '#A1887F', font: 'Inter', fontSize: 72 },
+        footer: { address: 'Cotonou, Bénin', phone: '+229 00 00 00 00', email: 'contact@lebaobab.com', socials: { facebook: '#', instagram: '#' }, newsletterEnabled: true },
+        cta: { title: 'Envie de goûter ?', buttonText: 'Réserver une table', action: 'reserve' },
+        navLayout: 1
+    },
+    3: { 
+        hero: { title: 'Bakery Sweet', tagline: 'Douceurs du jour', description: 'Pâtisseries fraîches préparées avec passion chaque matin.', image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=1600&q=80', color: '#F06292', font: 'Quicksand', fontSize: 80 },
+        footer: { address: 'Cotonou, Bénin', phone: '+229 00 00 00 00', email: 'contact@lebaobab.com', socials: { facebook: '#', instagram: '#' }, newsletterEnabled: true },
+        cta: { title: 'Envie de goûter ?', buttonText: 'Réserver une table', action: 'reserve' },
+        navLayout: 1
+    },
+    4: { 
+        hero: { title: 'Digital Menu', tagline: 'Rapide & Moderne', description: 'Commandez en quelques clics depuis votre table.', image: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?w=1600&q=80', color: '#007AFF', font: 'Inter', fontSize: 64 },
+        footer: { address: 'Cotonou, Bénin', phone: '+229 00 00 00 00', email: 'contact@lebaobab.com', socials: { facebook: '#', instagram: '#' }, newsletterEnabled: true },
+        cta: { title: 'Envie de goûter ?', buttonText: 'Réserver une table', action: 'reserve' },
+        navLayout: 1
+    },
+    5: { 
+        hero: { title: 'Zen Africain', tagline: 'Cuisine du terroir', description: 'L\'authenticité de nos terres dans votre assiette.', image: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=1600&q=80', color: '#3D5A40', font: 'Cormorant Garamond', fontSize: 96 },
+        footer: { address: 'Cotonou, Bénin', phone: '+229 00 00 00 00', email: 'contact@lebaobab.com', socials: { facebook: '#', instagram: '#' }, newsletterEnabled: true },
+        cta: { title: 'Envie de goûter ?', buttonText: 'Réserver une table', action: 'reserve' },
+        navLayout: 1
+    },
   },
   table: 'Table 7',
-  logo: '',
-  footer: {
-    address: 'Cotonou, Bénin',
-    phone: '+229 00 00 00 00',
-    email: 'contact@lebaobab.com',
-    socials: { facebook: '#', instagram: '#' },
-    newsletterEnabled: true
-  }
 };
 
 export const MENU = {

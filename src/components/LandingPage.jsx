@@ -6,6 +6,7 @@ import Footer from './Footer.jsx';
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
 const DEFAULT_HERO = { title: 'Le Baobab', tagline: 'Cuisine locale & internationale', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques.', image: '', color: '#F5A623', font: 'Sora', fontSize: 88 };
+const DEFAULT_CTA = { title: 'Envie de goûter ?', buttonText: 'Réserver une table' };
 
 const getContrastColor = (hexColor) => {
   if (!hexColor) return '#fff';
@@ -17,20 +18,15 @@ const getContrastColor = (hexColor) => {
 };
 
 const getHero = (restaurant, activeTheme) => {
-  const custom = (restaurant.hero && restaurant.hero[activeTheme]) ? restaurant.hero[activeTheme] : {};
-  const defaults = (RESTAURANT.heroDefaults && RESTAURANT.heroDefaults[activeTheme]) ? RESTAURANT.heroDefaults[activeTheme] : DEFAULT_HERO;
-  
-  // Merge, prioritizing custom values, but keeping defaults for missing custom fields
+  const custom = (restaurant.config && restaurant.config[activeTheme] && restaurant.config[activeTheme].hero) ? restaurant.config[activeTheme].hero : {};
+  const defaults = (RESTAURANT.config && RESTAURANT.config[activeTheme] && RESTAURANT.config[activeTheme].hero) ? RESTAURANT.config[activeTheme].hero : DEFAULT_HERO;
   const merged = { ...defaults, ...custom };
-  
-  // Clean up empty strings or nulls, ensuring defaults are used if custom field is empty
-  Object.keys(merged).forEach(key => {
-    if (merged[key] === '' || merged[key] === null || merged[key] === undefined) {
-        merged[key] = defaults[key];
-    }
-  });
-
+  Object.keys(merged).forEach(key => { if (merged[key] === '' || merged[key] === null || merged[key] === undefined) merged[key] = defaults[key]; });
   return merged;
+};
+
+const getCTA = (restaurant, activeTheme) => {
+    return (restaurant.config && restaurant.config[activeTheme] && restaurant.config[activeTheme].cta) ? restaurant.config[activeTheme].cta : DEFAULT_CTA;
 };
 
 const Badge = ({ label, accent, accent2 }) => {
@@ -46,12 +42,20 @@ const Badge = ({ label, accent, accent2 }) => {
   );
 };
 
-function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
+const CTASection = ({ cta, theme, onReserve }) => (
+    <div style={{ background: theme.accent, color: getContrastColor(theme.accent), padding: '60px 24px', textAlign: 'center' }}>
+        <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 20 }}>{cta.title}</h2>
+        <button onClick={onReserve} style={{ background: '#fff', color: theme.accent, border: 'none', padding: '16px 32px', borderRadius: 99, fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>{cta.buttonText}</button>
+    </div>
+);
+
+function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme, onReserve }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const [items, setItems] = useState(menu[activeCat]);
   const [animating, setAnimating] = useState(false);
   const hero = getHero(restaurant, activeTheme);
+  const cta = getCTA(restaurant, activeTheme);
 
   React.useEffect(() => {
     setItems(menu[activeCat] || []);
@@ -149,16 +153,18 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           })}
         </div>
       </div>
+      <CTASection cta={cta} theme={t} onReserve={onReserve} />
       <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
+function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme, onReserve }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
   const hero = getHero(restaurant, activeTheme);
+  const cta = getCTA(restaurant, activeTheme);
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
@@ -226,16 +232,18 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           );
         })}
       </div>
+      <CTASection cta={cta} theme={t} onReserve={onReserve} />
       <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
+function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme, onReserve }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
   const hero = getHero(restaurant, activeTheme);
+  const cta = getCTA(restaurant, activeTheme);
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
@@ -299,16 +307,18 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           })}
         </div>
       </div>
+      <CTASection cta={cta} theme={t} onReserve={onReserve} />
       <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
+function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme, onReserve }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
   const hero = getHero(restaurant, activeTheme);
+  const cta = getCTA(restaurant, activeTheme);
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
@@ -374,16 +384,18 @@ function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           })}
         </div>
       </div>
+      <CTASection cta={cta} theme={t} onReserve={onReserve} />
       <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme }) {
+function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme, onReserve }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
   const currentCat = menu[activeCat] ? activeCat : cats[0];
   const hero = getHero(restaurant, activeTheme);
+  const cta = getCTA(restaurant, activeTheme);
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.bodyFont || 'Inter, sans-serif' }}>
@@ -495,12 +507,13 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
            <Star size={16} /> <Star size={16} /> <Star size={16} />
         </div>
       </div>
+      <CTASection cta={cta} theme={t} onReserve={onReserve} />
       <Footer restaurant={restaurant} theme={t} />
     </div>
   );
 }
 
-export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveTheme, restaurant, customThemeColors, setSelectedItem, setView }) {
+export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveTheme, restaurant, customThemeColors, setSelectedItem, setView, onReserve }) {
   const [showSwitcher, setShowSwitcher] = useState(false);
   const t = THEMES[activeTheme];
   const adjustedTheme = { ...t, accent: customThemeColors[activeTheme] || t.accent };
@@ -518,7 +531,7 @@ export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveT
           .theme5-cart-container { justify-content: flex-end !important; }
         }
       `}</style>
-      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} theme={adjustedTheme} setSelectedItem={setSelectedItem} setView={setView} activeTheme={activeTheme} />
+      <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} theme={adjustedTheme} setSelectedItem={setSelectedItem} setView={setView} activeTheme={activeTheme} onReserve={onReserve} />
       <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 100 }}>
         <button onClick={() => setShowSwitcher(!showSwitcher)}
           style={{ width: 50, height: 50, borderRadius: '50%', background: adjustedTheme.accent, border: 'none', color: getContrastColor(adjustedTheme.accent), display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>

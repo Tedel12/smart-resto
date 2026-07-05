@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
 import { D_DARK, D_LIGHT, dFont, THEMES, RESTAURANT } from '../data/index.js';
-import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, Menu, X, MapPin } from 'lucide-react';
+import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, Menu, X, MapPin, Settings } from 'lucide-react';
 import { useMediaQuery } from '../hooks/index.js';
 
 const fmt = (n) => {
   const value = Number(n);
   return (isNaN(value) ? 0 : value).toLocaleString('fr-FR') + ' FCFA';
+};
+
+const getContrastColor = (hexColor) => {
+  if (!hexColor) return '#fff';
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return (yiq >= 128) ? '#000' : '#fff';
 };
 
 export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode, restaurant, setRestaurant, showToast, customThemeColors, setCustomThemeColors }) {
@@ -33,14 +42,26 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
   const updateFooter = (key, value) => {
     setDraftRestaurant(prev => ({
         ...prev,
-        footer: { ...prev.footer, [key]: value }
+        config: {
+            ...prev.config,
+            [activeTheme]: {
+                ...prev.config[activeTheme],
+                footer: { ...prev.config[activeTheme].footer, [key]: value }
+            }
+        }
     }));
   };
 
   const updateSocial = (platform, value) => {
     setDraftRestaurant(prev => ({
         ...prev,
-        footer: { ...prev.footer, socials: { ...prev.footer.socials, [platform]: value } }
+        config: {
+            ...prev.config,
+            [activeTheme]: {
+                ...prev.config[activeTheme],
+                footer: { ...prev.config[activeTheme].footer, socials: { ...prev.config[activeTheme].footer.socials, [platform]: value } }
+            }
+        }
     }));
   };
 
@@ -110,8 +131,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
             { id: 'stats',  label: 'Statistiques', icon: BarChart3 },
             { id: 'menu',   label: 'Menu', icon: Utensils },
             { id: 'themes', label: 'Templates', icon: Palette },
-            { id: 'hero',   label: 'Configuration Hero', icon: ChefHat },
-            { id: 'footer', label: 'Configuration Footer', icon: MapPin },
+            { id: 'config', label: 'Configurations', icon: Settings },
           ].map(tabItem => (
             <button key={tabItem.id} onClick={() => { setTab(tabItem.id); setIsSidebarOpen(false); }}
               style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px',
@@ -218,11 +238,34 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
           )}
           {tab === 'stats' && (
             <div>
-              <h2 style={s.sectionTitle}>Statistiques</h2>
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20}}>
+                <h2 style={s.sectionTitle}>Statistiques</h2>
+                <button onClick={() => {
+                    const csvContent = "data:text/csv;charset=utf-8," + 
+                        "Date,Table,Items,Total\n" + 
+                        orders.map(o => `${new Date(o.id).toLocaleDateString()},${o.table},${o.items.map(i=>i.name).join(';')},${o.total}`).join("\n");
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", "commandes.csv");
+                    document.body.appendChild(link);
+                    link.click();
+                }} style={{ background: accent, color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Exporter CSV</button>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
-                <StatCard label="Chiffre semaine" value="537 000 FCFA" icon={TrendingUp} color={D.green} />
-                <StatCard label="Commandes mois" value="248" icon={Receipt} color={D.blue} />
-                <StatCard label="Panier moyen" value="7 200 FCFA" icon={Utensils} color={D.purple} />
+                <StatCard label="Chiffre semaine" value={`${totalRevenue.toLocaleString()} FCFA`} icon={TrendingUp} color={D.green} />
+                <StatCard label="Commandes mois" value={orders.length} icon={Receipt} color={D.blue} />
+                <StatCard label="Panier moyen" value={fmt(totalRevenue / (orders.length || 1))} icon={Utensils} color={D.purple} />
+              </div>
+              <h3 style={{...s.sectionTitle, fontSize: 16}}>Ventes par catégories</h3>
+              <div style={{background: D.card, padding: 20, borderRadius: 12}}>
+                  {Object.keys(menu).map(cat => {
+                      const sales = orders.reduce((acc, o) => acc + o.items.filter(i => menu[cat].find(m => m.id === i.id)).reduce((a, b) => a + b.price * b.qty, 0), 0);
+                      return <div key={cat} style={{display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${D.border}`}}>
+                          <span>{cat}</span>
+                          <span style={{fontWeight: 700}}>{fmt(sales)}</span>
+                      </div>
+                  })}
               </div>
             </div>
           )}
@@ -288,23 +331,24 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
               )}
             </div>
           )}
-          {tab === 'hero' && (
+          {tab === 'config' && (
             <div style={{display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20}}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                    <h2 style={s.sectionTitle}>Configuration Hero ({t.name})</h2>
+                    <h2 style={s.sectionTitle}>Configurations ({t.name})</h2>
                     <button onClick={saveConfig} style={{ background: accent, color: isDarkMode ? '#000' : '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Enregistrer</button>
                 </div>
-                <div style={{ background: D.card, padding: 20, borderRadius: 12 }}>
-                    {/* ... Inputs (same as before) ... */}
+                {/* Hero Config */}
+                <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
+                    <h3 style={{...s.sectionTitle, fontSize: 16, marginBottom: 15}}>Section Hero</h3>
                     <label style={{ color: D.muted, fontSize: 12 }}>Titre</label>
-                    <input value={draftRestaurant.hero[activeTheme]?.title || ''} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], title: e.target.value}}}))} style={{...s.input, marginBottom: 10}} />
+                    <input value={draftRestaurant.config[activeTheme]?.hero?.title || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, title: e.target.value}}}}))} style={{...s.input, marginBottom: 10}} />
                     
                     <label style={{ color: D.muted, fontSize: 12 }}>Tagline</label>
-                    <input value={draftRestaurant.hero[activeTheme]?.tagline || ''} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], tagline: e.target.value}}}))} style={{...s.input, marginBottom: 10}} />
+                    <input value={draftRestaurant.config[activeTheme]?.hero?.tagline || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, tagline: e.target.value}}}}))} style={{...s.input, marginBottom: 10}} />
 
                     <label style={{ color: D.muted, fontSize: 12 }}>Description</label>
-                    <textarea value={draftRestaurant.hero[activeTheme]?.description || ''} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], description: e.target.value}}}))} style={{...s.input, marginBottom: 10, minHeight: 60}} />
+                    <textarea value={draftRestaurant.config[activeTheme]?.hero?.description || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, description: e.target.value}}}}))} style={{...s.input, marginBottom: 10, minHeight: 60}} />
 
                     <label style={{ color: D.muted, fontSize: 12 }}>Image</label>
                     <input type="file" accept="image/*" onChange={(e) => {
@@ -312,7 +356,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                         if (file) {
                             const reader = new FileReader();
                             reader.onloadend = () => {
-                                setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], image: reader.result}}}));
+                                setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, image: reader.result}}}}));
                             };
                             reader.readAsDataURL(file);
                         }
@@ -321,11 +365,11 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                     <div style={{display: 'flex', gap: 20, marginTop: 10, flexWrap: 'wrap'}}>
                         <div style={{flex: 1}}>
                             <label style={{ color: D.muted, fontSize: 12 }}>Couleur d'accent</label>
-                            <input type="color" value={draftRestaurant.hero[activeTheme]?.color || '#F5A623'} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], color: e.target.value}}}))} style={{...s.input, padding: 5, height: 40}} />
+                            <input type="color" value={draftRestaurant.config[activeTheme]?.hero?.color || '#F5A623'} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, color: e.target.value}}}}))} style={{...s.input, padding: 5, height: 40}} />
                         </div>
                         <div style={{flex: 1}}>
                             <label style={{ color: D.muted, fontSize: 12 }}>Police</label>
-                            <select value={draftRestaurant.hero[activeTheme]?.font || 'Sora'} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], font: e.target.value}}}))} style={{...s.input, height: 40}}>
+                            <select value={draftRestaurant.config[activeTheme]?.hero?.font || 'Sora'} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, font: e.target.value}}}}))} style={{...s.input, height: 40}}>
                                 <option>Sora</option>
                                 <option>Inter</option>
                                 <option>Quicksand</option>
@@ -334,78 +378,97 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                         </div>
                         <div style={{flex: 1}}>
                             <label style={{ color: D.muted, fontSize: 12 }}>Taille Titre (px)</label>
-                            <input type="number" value={draftRestaurant.hero[activeTheme]?.fontSize || 88} onChange={e => setDraftRestaurant(prev => ({...prev, hero: {...prev.hero, [activeTheme]: {...prev.hero[activeTheme], fontSize: e.target.value}}}))} style={{...s.input, height: 40}} />
+                            <input type="number" value={draftRestaurant.config[activeTheme]?.hero?.fontSize || 88} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, fontSize: e.target.value}}}}))} style={{...s.input, height: 40}} />
+                        </div>
+                    </div>
+                </div>
+                {/* CTA Config */}
+                <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
+                    <h3 style={{...s.sectionTitle, fontSize: 16, marginBottom: 15}}>Section Call to Action</h3>
+                    <label style={{ color: D.muted, fontSize: 12 }}>Titre CTA</label>
+                    <input value={draftRestaurant.config[activeTheme]?.cta?.title || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], cta: {...prev.config[activeTheme].cta, title: e.target.value}}}}))} style={{...s.input, marginBottom: 10}} />
+                    
+                    <label style={{ color: D.muted, fontSize: 12 }}>Texte bouton</label>
+                    <input value={draftRestaurant.config[activeTheme]?.cta?.buttonText || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], cta: {...prev.config[activeTheme].cta, buttonText: e.target.value}}}}))} style={{...s.input, marginBottom: 10}} />
+                </div>
+                {/* Nav Layout Config */}
+                <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
+                    <h3 style={{...s.sectionTitle, fontSize: 16, marginBottom: 15}}>Disposition Navigation</h3>
+                    <select value={draftRestaurant.config[activeTheme]?.navLayout || 1} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], navLayout: Number(e.target.value)}}}))} style={{...s.input, height: 40}}>
+                        <option value={1}>Style 1 (Standard)</option>
+                        <option value={2}>Style 2 (Logo Centré)</option>
+                        <option value={3}>Style 3 (Sidebar)</option>
+                    </select>
+                </div>
+                {/* Footer Config */}
+                <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
+                    <h3 style={{...s.sectionTitle, fontSize: 16, marginBottom: 15}}>Footer & Logo</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                        <div>
+                            <label style={{ color: D.muted, fontSize: 12, marginBottom: 8, display: 'block' }}>Logo</label>
+                            <input type="file" accept="image/*" onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                        setDraftRestaurant(prev => ({...prev, logo: reader.result}));
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            }} style={{...s.input, marginBottom: 10}} />
+
+                            <label style={{ color: D.muted, fontSize: 12 }}>Nom du restaurant</label>
+                            <input value={draftRestaurant.name} onChange={e => setDraftRestaurant(prev => ({...prev, name: e.target.value}))} style={{...s.input, marginBottom: 10}} />
+
+                            <label style={{ color: D.muted, fontSize: 12 }}>Adresse</label>
+                            <input value={draftRestaurant.name} onChange={e => setDraftRestaurant(prev => ({...prev, name: e.target.value}))} style={{...s.input, marginBottom: 10}} />
+
+                            <label style={{ color: D.muted, fontSize: 12 }}>Adresse</label>
+                            <input value={draftRestaurant.config[activeTheme]?.footer?.address || ''} onChange={e => updateFooter('address', e.target.value)} style={{...s.input, marginBottom: 10}} />
+                            
+                            <label style={{ color: D.muted, fontSize: 12 }}>Téléphone</label>
+                            <input value={draftRestaurant.config[activeTheme]?.footer?.phone || ''} onChange={e => updateFooter('phone', e.target.value)} style={{...s.input, marginBottom: 10}} />
+                            
+                            <label style={{ color: D.muted, fontSize: 12 }}>Email</label>
+                            <input value={draftRestaurant.config[activeTheme]?.footer?.email || ''} onChange={e => updateFooter('email', e.target.value)} style={{...s.input}} />
+                        </div>
+                        <div>
+                            <label style={{ color: D.muted, fontSize: 12 }}>Facebook</label>
+                            <input value={draftRestaurant.config[activeTheme]?.footer?.socials?.facebook || ''} onChange={e => updateSocial('facebook', e.target.value)} style={{...s.input, marginBottom: 10}} />
+                            
+                            <label style={{ color: D.muted, fontSize: 12 }}>Instagram</label>
+                            <input value={draftRestaurant.config[activeTheme]?.footer?.socials?.instagram || ''} onChange={e => updateSocial('instagram', e.target.value)} style={{...s.input, marginBottom: 10}} />
+                            
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', marginTop: 10 }}>
+                                <input type="checkbox" checked={draftRestaurant.config[activeTheme]?.footer?.newsletterEnabled || false} onChange={e => updateFooter('newsletterEnabled', e.target.checked)} />
+                                <span style={{ color: D.text }}>Activer Newsletter</span>
+                            </label>
                         </div>
                     </div>
                 </div>
               </div>
               <div style={{ position: 'sticky', top: 20 }}>
-                <h3 style={{...s.sectionTitle, fontSize: 14}}>Aperçu Hero</h3>
-                <div style={{ height: 300, background: '#000', borderRadius: 12, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 20 }}>
-                    <div style={{ position: 'absolute', inset: 0, background: `url(${draftRestaurant.hero[activeTheme]?.image || ''}) center/cover`, filter: 'brightness(.4)' }} />
-                    <div style={{position: 'relative', color: '#fff', fontFamily: draftRestaurant.hero[activeTheme]?.font || 'Sora'}}>
-                        <h1 style={{fontSize: 24, margin: 0, color: draftRestaurant.hero[activeTheme]?.color || accent}}>{draftRestaurant.hero[activeTheme]?.title || 'Titre'}</h1>
-                        <p style={{fontSize: 12, margin: '8px 0'}}>{draftRestaurant.hero[activeTheme]?.tagline || 'Tagline'}</p>
+                <h3 style={{...s.sectionTitle, fontSize: 14}}>Aperçu</h3>
+                <div style={{ background: D.card, padding: 20, borderRadius: 12 }}>
+                    <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10}}>Hero</div>
+                    <div style={{ height: 150, background: '#000', borderRadius: 8, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 10 }}>
+                        <div style={{ position: 'absolute', inset: 0, background: `url(${draftRestaurant.config[activeTheme]?.hero?.image || ''}) center/cover`, filter: 'brightness(.4)' }} />
+                        <div style={{position: 'relative', color: '#fff'}}>
+                            <h1 style={{fontSize: 16, margin: 0, color: draftRestaurant.config[activeTheme]?.hero?.color || accent}}>{draftRestaurant.config[activeTheme]?.hero?.title || 'Titre'}</h1>
+                            <p style={{fontSize: 10, margin: '4px 0'}}>{draftRestaurant.config[activeTheme]?.hero?.tagline || 'Tagline'}</p>
+                        </div>
                     </div>
-                </div>
-              </div>
-            </div>
-          )}
-          {tab === 'footer' && (
-            <div style={{display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20}}>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                    <h2 style={s.sectionTitle}>Personnalisation Footer & Logo</h2>
-                    <button onClick={saveConfig} style={{ background: accent, color: isDarkMode ? '#000' : '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Enregistrer</button>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-                    <div style={{ background: D.card, padding: 20, borderRadius: 12 }}>
-                        <label style={{ color: D.muted, fontSize: 12, marginBottom: 8, display: 'block' }}>Logo</label>
-                        <input type="file" accept="image/*" onChange={(e) => {
-                            const file = e.target.files[0];
-                            if (file) {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                    setDraftRestaurant(prev => ({...prev, logo: reader.result}));
-                                };
-                                reader.readAsDataURL(file);
-                            }
-                        }} style={{...s.input, marginBottom: 10}} />
-
-                        <label style={{ color: D.muted, fontSize: 12 }}>Adresse</label>
-                        <input value={draftRestaurant.footer.address} onChange={e => updateFooter('address', e.target.value)} style={{...s.input, marginBottom: 10}} />
-                        
-                        <label style={{ color: D.muted, fontSize: 12 }}>Téléphone</label>
-                        <input value={draftRestaurant.footer.phone} onChange={e => updateFooter('phone', e.target.value)} style={{...s.input, marginBottom: 10}} />
-                        
-                        <label style={{ color: D.muted, fontSize: 12 }}>Email</label>
-                        <input value={draftRestaurant.footer.email} onChange={e => updateFooter('email', e.target.value)} style={{...s.input}} />
+                    <div style={{fontSize: 12, fontWeight: 700, marginTop: 20, marginBottom: 10}}>CTA</div>
+                    <div style={{ background: accent, color: getContrastColor(accent), padding: 15, borderRadius: 8, fontSize: 10, textAlign: 'center' }}>
+                        <div style={{fontWeight: 700, marginBottom: 5}}>{draftRestaurant.config[activeTheme]?.cta?.title || 'Titre CTA'}</div>
+                        <div style={{background: 'rgba(0,0,0,0.2)', padding: '5px 10px', borderRadius: 4, display: 'inline-block'}}>{draftRestaurant.config[activeTheme]?.cta?.buttonText || 'Bouton'}</div>
                     </div>
-                    <div style={{ background: D.card, padding: 20, borderRadius: 12 }}>
-                        <label style={{ color: D.muted, fontSize: 12 }}>Facebook</label>
-                        <input value={draftRestaurant.footer.socials.facebook} onChange={e => updateSocial('facebook', e.target.value)} style={{...s.input, marginBottom: 10}} />
-                        
-                        <label style={{ color: D.muted, fontSize: 12 }}>Instagram</label>
-                        <input value={draftRestaurant.footer.socials.instagram} onChange={e => updateSocial('instagram', e.target.value)} style={{...s.input, marginBottom: 10}} />
-                        
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', marginTop: 10 }}>
-                            <input type="checkbox" checked={draftRestaurant.footer.newsletterEnabled} onChange={e => updateFooter('newsletterEnabled', e.target.checked)} />
-                            <span style={{ color: D.text }}>Activer Newsletter</span>
-                        </label>
-                    </div>
-                </div>
-              </div>
-              <div style={{ position: 'sticky', top: 20 }}>
-                <h3 style={{...s.sectionTitle, fontSize: 14}}>Aperçu Footer</h3>
-                <div style={{ background: '#1c1c1c', color: '#fff', padding: 20, borderRadius: 12, fontSize: 12, textAlign: 'center' }}>
-                    {draftRestaurant.logo && <img src={draftRestaurant.logo} style={{height: 40, marginBottom: 10}} alt="Logo" />}
-                    <div style={{fontWeight: 700, marginBottom: 5}}>{draftRestaurant.name}</div>
-                    <div style={{opacity: 0.7}}>{draftRestaurant.footer.address}</div>
-                    <div style={{opacity: 0.7}}>{draftRestaurant.footer.phone}</div>
-                    <div style={{opacity: 0.7}}>{draftRestaurant.footer.email}</div>
-                    <div style={{marginTop: 10, display: 'flex', justifyContent: 'center', gap: 10, opacity: 0.6}}>
-                        {draftRestaurant.footer.socials.facebook && <span>FB</span>}
-                        {draftRestaurant.footer.socials.instagram && <span>IG</span>}
+                    <div style={{fontSize: 12, fontWeight: 700, marginTop: 20, marginBottom: 10}}>Footer</div>
+                    <div style={{ background: '#1c1c1c', color: '#fff', padding: 15, borderRadius: 8, fontSize: 10, textAlign: 'center' }}>
+                        {draftRestaurant.logo && <img src={draftRestaurant.logo} style={{height: 30, marginBottom: 5}} alt="Logo" />}
+                        <div style={{fontWeight: 700, marginBottom: 2}}>{draftRestaurant.name}</div>
+                        <div style={{opacity: 0.7}}>{draftRestaurant.config[activeTheme]?.footer?.address || ''}</div>
+                        <div style={{opacity: 0.7}}>{draftRestaurant.config[activeTheme]?.footer?.phone || ''}</div>
                     </div>
                 </div>
               </div>
