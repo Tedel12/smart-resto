@@ -3,6 +3,7 @@ import { D_DARK, D_LIGHT, dFont, THEMES, RESTAURANT } from '../data/index.js';
 import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, Menu, X, MapPin, Settings } from 'lucide-react';
 import { useMediaQuery } from '../hooks/index.js';
 
+
 const fmt = (n) => {
   const value = Number(n);
   return (isNaN(value) ? 0 : value).toLocaleString('fr-FR') + ' FCFA';
@@ -17,7 +18,7 @@ const getContrastColor = (hexColor) => {
   return (yiq >= 128) ? '#000' : '#fff';
 };
 
-export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode, restaurant, setRestaurant, showToast, customThemeColors, setCustomThemeColors }) {
+export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode, restaurant, setRestaurant, showToast, customThemeColors, setCustomThemeColors, archivedOrders }) {
   const t = THEMES[activeTheme];
   const D = isDarkMode ? D_DARK : D_LIGHT;
   const accent = customThemeColors[activeTheme] || t.accent || D.gold;
@@ -73,7 +74,6 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
   const tables = ['Tous', ...new Set(orders.map(o => o.table))];
   const filteredOrders = selectedTable === 'Tous' ? orders : orders.filter(o => o.table === selectedTable);
 
-  const totalRevenue = orders.filter(o => o.status === 'servi').reduce((s, o) => s + o.total, 0);
   const pending = orders.filter(o => o.status === 'en attente').length;
   const inProgress = orders.filter(o => o.status === 'en cours').length;
   const ready = orders.filter(o => o.status === 'prêt').length;
@@ -84,7 +84,8 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
     'prêt':       D.green,
     'servi':      D.muted,
   };
-  const STATUS_LIST = ['en attente', 'en cours', 'prêt', 'servi'];
+  const allOrders = [...orders, ...archivedOrders];
+  const totalRevenue = allOrders.filter(o => o.status === 'servi').reduce((s, o) => s + o.total, 0);
 
   const StatCard = ({ label, value, sub, color, icon: Icon }) => (
     <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: '22px 24px', borderTop: `3px solid ${color}` }}>
