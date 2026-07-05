@@ -476,7 +476,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                 <input type="text" defaultValue={itemToEdit.img} id="edit-img" style={{...s.input, display: 'none'}} />
               </div>
 
-              <div style={{ display: 'flex', gap: 24, alignItems: 'center', marginTop: 4 }}>
+              <div style={{ display: 'flex', gap: 24, alignItems: 'center', marginTop: 4, flexWrap: 'wrap' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: D.text, fontSize: 13, cursor: 'pointer' }}>
                   <input type="checkbox" defaultChecked={itemToEdit.hot} id="edit-hot" /> Épicé
                 </label>
