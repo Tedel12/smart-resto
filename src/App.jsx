@@ -140,10 +140,13 @@ export default function App() {
         borderBottom: `1px solid ${navBorder}`, display: 'flex', alignItems: 'center',
         justifyContent: 'space-between', padding: '0 12px', height: 56, transition: 'all 0.3s' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ color: accent, fontWeight: 800, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Trees size={18} /> {restaurant.name}
-          </span>
-          <div style={{ width: 1, height: 20, background: navBorder }} />
+          {restaurant.logo ? (
+            <img src={restaurant.logo} alt="Logo" style={{ height: 32, width: 32, objectFit: 'contain', borderRadius: 4 }} />
+          ) : (
+            <Trees size={18} style={{ color: accent }} />
+          )}
+          <span style={{ color: accent, fontWeight: 800, fontSize: 16 }}>{restaurant.name}</span>
+          <div style={{ width: 1, height: 20, background: navBorder, marginLeft: 8 }} />
           <button onClick={() => setView('landing')}
             style={{ background: view === 'landing' ? `${accent}22` : 'none', color: view === 'landing' ? accent : currentTheme.muted,
               border: 'none', padding: '6px 8px', borderRadius: 8, fontFamily: currentTheme.font, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, transition: 'all 0.2s' }}>
@@ -174,8 +177,7 @@ export default function App() {
             </button>
           )}
         </div>
-      </nav>
-
+        </nav>
       {/* ── Content (with top padding for nav) ── */}
       <div style={{ paddingTop: 56 }}>
         {view === 'landing' ? (

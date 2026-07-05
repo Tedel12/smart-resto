@@ -1,6 +1,7 @@
 export const RESTAURANT = {
   name: 'Le Baobab',
   tagline: 'Cuisine locale & internationale',
+  logo: '',
   heroDefaults: {
     1: { title: 'Le Baobab', tagline: 'Élégance culinaire', description: 'Une expérience gastronomique qui célèbre les saveurs authentiques.', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80', color: '#F5A623', font: 'Sora', fontSize: 88 },
     2: { title: 'Coffee Lounge', tagline: 'Détente & Café', description: 'Le lieu idéal pour vos pauses gourmandes et rendez-vous.', image: 'https://images.unsplash.com/photo-1559925393-8be07e767250?w=1600&q=80', color: '#A1887F', font: 'Inter', fontSize: 72 },
