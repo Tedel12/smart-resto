@@ -84,6 +84,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
     'prêt':       D.green,
     'servi':      D.muted,
   };
+  const STATUS_LIST = Object.keys(STATUS_COLORS);
   const allOrders = [...orders, ...archivedOrders];
   const totalRevenue = allOrders.filter(o => o.status === 'servi').reduce((s, o) => s + o.total, 0);
 

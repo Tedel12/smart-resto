@@ -43,7 +43,7 @@ export function useCart() {
   return { items, add, remove, clear, total, count };
 }
 
-// ── CODE CORRIGÉ POUR USEORDERS ──
+
 export function useOrders() {
   const [orders, setOrders] = useState(() => {
     try {
