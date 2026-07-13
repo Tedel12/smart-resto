@@ -19,7 +19,7 @@ export default function Footer({ restaurant, theme }) {
         <div>
           <h4 style={{ color: theme.text, fontSize: 16, fontWeight: 600, marginBottom: 20 }}>Contact</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><MapPin size={16} /> {footer.address}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><MapPin size={16} /> {footer?.address || ''}</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Phone size={16} /> {footer.phone}</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Mail size={16} /> {footer.email}</span>
           </div>

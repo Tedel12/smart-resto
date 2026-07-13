@@ -502,7 +502,7 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
 
       <div style={{ background: '#1C1A15', color: 'rgba(250,248,243,.4)', textAlign: 'center', padding: '60px 24px', fontSize: 13, letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>
         <div style={{ color: t.accent2, marginBottom: 16, fontFamily: t.font, fontSize: 22, fontStyle: 'italic' }}>{restaurant.name}</div>
-        <div style={{ marginBottom: 20 }}>{restaurant.footer.address} · {restaurant.footer.phone}</div>
+        <div style={{ marginBottom: 20 }}>{restaurant.footer?.address || ''} · {restaurant.footer?.phone || ''}</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 24, color: 'rgba(250,248,243,.2)' }}>
            <Star size={16} /> <Star size={16} /> <Star size={16} />
         </div>
