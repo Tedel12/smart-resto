@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useCart, useOrders, useReservations, useTableStatus, useMediaQuery } from './hooks/index.js';
+import { useCart, useOrders, useReservations, useTableStatus, useMediaQuery, useMenu, useRestaurant } from './hooks/index.js';
 import LandingPage from './components/LandingPage.jsx';
 import CartSidebar from './components/CartSidebar.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import ItemDetail from './components/ItemDetail.jsx';
 import { D, dFont, RESTAURANT, THEMES, MENU, TABLES } from './data/index.js';
+import { readStorage, writeStorage } from './lib/storage.js';
 import { Trees, Globe, Settings, ShoppingCart, Check, CalendarCheck, ChefHat } from 'lucide-react';
 import ReservationModal from './components/ReservationModal.jsx';
 import AlertModal from './components/AlertModal.jsx';
@@ -58,50 +59,19 @@ const Nav = ({ restaurant, accent, accentText, currentTheme, navBg, navBorder, v
 
 export default function App() {
   const cart = useCart();
-  const { orders, updateStatus, addOrder, deleteOrder, markPaid } = useOrders();
+  const { orders, archivedOrders, updateStatus, addOrder, deleteOrder, markPaid } = useOrders();
   const { reservations, addReservation, deleteReservation } = useReservations();
   const { tableStatus, setTableStatus } = useTableStatus(TABLES);
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const [archivedOrders, setArchivedOrders] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('sr_archived_orders') || '[]'); }
-    catch(e) { return []; }
-  });
-
-  const handleDelete = (id) => {
-      const order = orders.find(o => o.id === id);
-      if (order) {
-          const newArchived = [...archivedOrders, order];
-          setArchivedOrders(newArchived);
-          localStorage.setItem('sr_archived_orders', JSON.stringify(newArchived));
-      }
-      deleteOrder(id);
-  };
-  const [view, setView] = useState(() => {
-    try {
-      return localStorage.getItem('sr_view') || 'landing';
-    } catch (e) {
-      return 'landing';
-    }
-  });
+  const [view, setView] = useState(() => readStorage('sr_view', 'landing'));
 
   const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('sr_view', view);
-    } catch (e) {
-      console.error(e);
-    }
+    writeStorage('sr_view', view);
   }, [view]);
   const [showCart, setShowCart] = useState(false);
-  const [activeTheme, setActiveTheme] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sr_theme');
-      return saved ? Number(saved) : 5;
-    } catch (e) {
-      return 5;
-    }
-  });
+  const [activeTheme, setActiveTheme] = useState(() => readStorage('sr_theme', 5));
   const [showRes, setShowRes] = useState(false);
   const [alertBox, setAlertBox] = useState(null);
 
@@ -116,68 +86,21 @@ export default function App() {
      buttonText: 'Parfait !',
    });
   };
-  const [menu, setMenu] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sr_menu');
-      return saved ? JSON.parse(saved) : MENU;
-    } catch (e) {
-      return MENU;
-    }
-  });
+  const [menu, setMenu] = useMenu(MENU);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [restaurant, setRestaurant] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sr_restaurant');
-      const parsed = saved ? JSON.parse(saved) : {};
-      const merged = { ...RESTAURANT, ...parsed };
-      merged.config = { ...RESTAURANT.config, ...parsed.config };
-      return merged;
-    } catch (e) {
-      return RESTAURANT;
-    }
-  });
+  const [restaurant, setRestaurant] = useRestaurant(RESTAURANT);
 
-  const [customThemeColors, setCustomThemeColors] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sr_custom_colors');
-      return saved ? JSON.parse(saved) : {};
-    } catch (e) {
-      return {};
-    }
-  });
+  const [customThemeColors, setCustomThemeColors] = useState(() => readStorage('sr_custom_colors', {}));
 
   useEffect(() => {
-    try {
-      localStorage.setItem('sr_custom_colors', JSON.stringify(customThemeColors));
-    } catch (e) {
-      console.error(e);
-    }
+    writeStorage('sr_custom_colors', customThemeColors);
   }, [customThemeColors]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('sr_restaurant', JSON.stringify(restaurant));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [restaurant]);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    try {
-      localStorage.setItem('sr_theme', activeTheme);
-    } catch (e) {
-      console.error(e);
-    }
+    writeStorage('sr_theme', activeTheme);
   }, [activeTheme]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('sr_menu', JSON.stringify(menu));
-    } catch (e) {
-      console.error(e);
-    }
-  }, [menu]);
 
   const getContrastColor = (hexColor) => {
     if (!hexColor) return '#fff';
@@ -231,7 +154,7 @@ export default function App() {
         ) : view === 'item-detail' ? (
           <ItemDetail item={selectedItem} theme={{ ...currentTheme, accent: accent }} onAdd={handleAdd} onClose={() => setView('landing')} />
         ) : (
-          <Dashboard menu={menu} setMenu={setMenu} orders={orders} archivedOrders={archivedOrders} updateStatus={updateStatus} markPaid={markPaid} deleteOrder={handleDelete} activeTheme={activeTheme} setActiveTheme={setActiveTheme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} restaurant={restaurant} setRestaurant={setRestaurant} showToast={showToast} customThemeColors={customThemeColors} setCustomThemeColors={setCustomThemeColors} tables={TABLES} tableStatus={tableStatus} setTableStatus={setTableStatus} reservations={reservations} deleteReservation={deleteReservation} />
+          <Dashboard menu={menu} setMenu={setMenu} orders={orders} archivedOrders={archivedOrders} updateStatus={updateStatus} markPaid={markPaid} deleteOrder={deleteOrder} activeTheme={activeTheme} setActiveTheme={setActiveTheme} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} restaurant={restaurant} setRestaurant={setRestaurant} showToast={showToast} customThemeColors={customThemeColors} setCustomThemeColors={setCustomThemeColors} tables={TABLES} tableStatus={tableStatus} setTableStatus={setTableStatus} reservations={reservations} deleteReservation={deleteReservation} />
         )}
       </div>
 

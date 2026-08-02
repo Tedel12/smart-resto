@@ -36,7 +36,14 @@ src/
 │   ├── CartSidebar.jsx  # Panier latéral
 │   └── Dashboard.jsx    # Admin : commandes, stats, menu, thèmes
 ├── data/index.js        # Menu, thèmes, tokens design
-├── hooks/index.js       # useCart, useOrders
+├── hooks/index.js       # useCart, useOrders, useReservations, useMenu, useRestaurant...
+├── services/            # Accès aux données (orders, reservations, tables, menu, restaurant, cart).
+│                         # Aujourd'hui persistées en localStorage — c'est le seul endroit à
+│                         # modifier pour brancher un vrai backend plus tard.
+├── lib/storage.js        # Wrapper localStorage utilisé par les services
+├── types.js              # Formes des objets (Order, Reservation, Restaurant...) en JSDoc,
+│                         # utile de référence pour construire l'API/BDD côté backend
+├── config.js              # VITE_API_URL (voir .env.example) — inutilisé tant qu'il n'y a pas de backend
 └── styles/global.css    # Fonts, animations, reset
 ```
 

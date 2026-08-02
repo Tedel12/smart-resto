@@ -1,21 +1,16 @@
 import { useState, useCallback, useEffect } from 'react';
+import * as cartService from '../services/cartService.js';
+import * as ordersService from '../services/ordersService.js';
+import * as reservationsService from '../services/reservationsService.js';
+import * as tablesService from '../services/tablesService.js';
+import * as menuService from '../services/menuService.js';
+import * as restaurantService from '../services/restaurantService.js';
 
 export function useCart() {
-  const [items, setItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sr_cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
-  });
+  const [items, setItems] = useState(() => cartService.getCart());
 
   useEffect(() => {
-    try {
-      localStorage.setItem('sr_cart', JSON.stringify(items));
-    } catch (e) {
-      console.error(e);
-    }
+    cartService.saveCart(items);
   }, [items]);
 
   const add = useCallback((item) => {
@@ -45,22 +40,16 @@ export function useCart() {
 
 
 export function useOrders() {
-  const [orders, setOrders] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sr_orders');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
-  });
+  const [orders, setOrders] = useState(() => ordersService.listOrders());
+  const [archivedOrders, setArchivedOrders] = useState(() => ordersService.listArchivedOrders());
 
   useEffect(() => {
-    try {
-      localStorage.setItem('sr_orders', JSON.stringify(orders));
-    } catch (e) {
-      console.error(e);
-    }
+    ordersService.saveOrders(orders);
   }, [orders]);
+
+  useEffect(() => {
+    ordersService.saveArchivedOrders(archivedOrders);
+  }, [archivedOrders]);
 
   const addOrder = useCallback((orderData) => {
     const total = orderData.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -88,30 +77,24 @@ export function useOrders() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, paid: true } : o));
   }, []);
 
+  // Removing an order from the active list archives it first, so it still counts
+  // toward historical revenue/stats after it's gone from "Commandes en cours".
   const deleteOrder = useCallback((id) => {
-    setOrders(prev => prev.filter(o => o.id !== id));
+    setOrders(prev => {
+      const order = prev.find(o => o.id === id);
+      if (order) setArchivedOrders(a => [...a, order]);
+      return prev.filter(o => o.id !== id);
+    });
   }, []);
 
-
-  return { orders, updateStatus, addOrder, deleteOrder, markPaid };
+  return { orders, archivedOrders, updateStatus, addOrder, deleteOrder, markPaid };
 }
 
 export function useReservations() {
-  const [reservations, setReservations] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sr_reservations');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      return [];
-    }
-  });
+  const [reservations, setReservations] = useState(() => reservationsService.listReservations());
 
   useEffect(() => {
-    try {
-      localStorage.setItem('sr_reservations', JSON.stringify(reservations));
-    } catch (e) {
-      console.error(e);
-    }
+    reservationsService.saveReservations(reservations);
   }, [reservations]);
 
   const addReservation = useCallback((data) => {
@@ -128,21 +111,10 @@ export function useReservations() {
 }
 
 export function useTableStatus(tables) {
-  const [status, setStatus] = useState(() => {
-    try {
-      const saved = localStorage.getItem('sr_tables');
-      return saved ? JSON.parse(saved) : {};
-    } catch (e) {
-      return {};
-    }
-  });
+  const [status, setStatus] = useState(() => tablesService.getTableStatusMap());
 
   useEffect(() => {
-    try {
-      localStorage.setItem('sr_tables', JSON.stringify(status));
-    } catch (e) {
-      console.error(e);
-    }
+    tablesService.saveTableStatusMap(status);
   }, [status]);
 
   const setTableStatus = useCallback((table, value) => {
@@ -152,6 +124,31 @@ export function useTableStatus(tables) {
   const getTableStatus = useCallback((table) => status[table] || 'libre', [status]);
 
   return { tableStatus: status, setTableStatus, getTableStatus };
+}
+
+export function useMenu(defaultMenu) {
+  const [menu, setMenu] = useState(() => menuService.getMenu(defaultMenu));
+
+  useEffect(() => {
+    menuService.saveMenu(menu);
+  }, [menu]);
+
+  return [menu, setMenu];
+}
+
+export function useRestaurant(defaultRestaurant) {
+  const [restaurant, setRestaurant] = useState(() => {
+    const overrides = restaurantService.getRestaurantOverrides();
+    const merged = { ...defaultRestaurant, ...overrides };
+    merged.config = { ...defaultRestaurant.config, ...overrides.config };
+    return merged;
+  });
+
+  useEffect(() => {
+    restaurantService.saveRestaurant(restaurant);
+  }, [restaurant]);
+
+  return [restaurant, setRestaurant];
 }
 
 export function useMediaQuery(query) {
