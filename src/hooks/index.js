@@ -74,7 +74,8 @@ export function useOrders() {
         timestamp: new Date().toLocaleTimeString(),
         total: total,
         comment: orderData.comment,
-        paymentMethod: orderData.paymentMethod
+        paymentMethod: orderData.paymentMethod,
+        paid: false,
       }
     ]);
   }, []);
@@ -83,12 +84,74 @@ export function useOrders() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
   }, []);
 
+  const markPaid = useCallback((id) => {
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, paid: true } : o));
+  }, []);
+
   const deleteOrder = useCallback((id) => {
     setOrders(prev => prev.filter(o => o.id !== id));
   }, []);
 
-  
-  return { orders, updateStatus, addOrder, deleteOrder };
+
+  return { orders, updateStatus, addOrder, deleteOrder, markPaid };
+}
+
+export function useReservations() {
+  const [reservations, setReservations] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sr_reservations');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sr_reservations', JSON.stringify(reservations));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [reservations]);
+
+  const addReservation = useCallback((data) => {
+    const reservation = { id: `RES-${Date.now()}`, createdAt: new Date().toLocaleString('fr-FR'), ...data };
+    setReservations(prev => [...prev, reservation]);
+    return reservation;
+  }, []);
+
+  const deleteReservation = useCallback((id) => {
+    setReservations(prev => prev.filter(r => r.id !== id));
+  }, []);
+
+  return { reservations, addReservation, deleteReservation };
+}
+
+export function useTableStatus(tables) {
+  const [status, setStatus] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sr_tables');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sr_tables', JSON.stringify(status));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [status]);
+
+  const setTableStatus = useCallback((table, value) => {
+    setStatus(prev => ({ ...prev, [table]: value }));
+  }, []);
+
+  const getTableStatus = useCallback((table) => status[table] || 'libre', [status]);
+
+  return { tableStatus: status, setTableStatus, getTableStatus };
 }
 
 export function useMediaQuery(query) {

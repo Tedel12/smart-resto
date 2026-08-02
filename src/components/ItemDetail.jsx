@@ -3,6 +3,15 @@ import { ArrowLeft, Plus, X } from 'lucide-react';
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
+const getContrastColor = (hexColor) => {
+  if (!hexColor) return '#fff';
+  const r = parseInt(hexColor.slice(1, 3), 16);
+  const g = parseInt(hexColor.slice(3, 5), 16);
+  const b = parseInt(hexColor.slice(5, 7), 16);
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return (yiq >= 128) ? '#000' : '#fff';
+};
+
 export default function ItemDetail({ item, theme, onAdd, onClose }) {
   const [show3D, setShow3D] = useState(false);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
@@ -40,7 +49,7 @@ export default function ItemDetail({ item, theme, onAdd, onClose }) {
           <p style={{ color: theme.muted, fontSize: 16, lineHeight: 1.6, marginBottom: 24 }}>{item.desc}</p>
           
           <button onClick={() => { onAdd(item); onClose(); }}
-            style={{ width: '100%', background: theme.accent, color: '#fff', border: 'none', padding: '16px', borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            style={{ width: '100%', background: theme.accent, color: getContrastColor(theme.accent), border: 'none', padding: '16px', borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <Plus size={20} /> Ajouter au panier
           </button>
         </div>

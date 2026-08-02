@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { THEMES, RESTAURANT } from '../data/index.js';
-import { Flame, ArrowRight, ChefHat, Minus, Plus, Palmtree, Zap, Star, Leaf, Coffee, Palette } from 'lucide-react';
+import { Flame, ArrowRight, ChefHat, Minus, Plus, Palmtree, Zap, Star, Leaf, Coffee, Palette, CalendarCheck } from 'lucide-react';
 import Footer from './Footer.jsx';
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
@@ -42,12 +42,24 @@ const Badge = ({ label, accent, accent2 }) => {
   );
 };
 
-const CTASection = ({ cta, theme, onReserve }) => (
-    <div style={{ background: theme.accent, color: getContrastColor(theme.accent), padding: '60px 24px', textAlign: 'center' }}>
-        <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 20 }}>{cta.title}</h2>
-        <button onClick={onReserve} style={{ background: '#fff', color: theme.accent, border: 'none', padding: '16px 32px', borderRadius: 99, fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>{cta.buttonText}</button>
+const CTASection = ({ cta, theme, onReserve }) => {
+    const textColor = getContrastColor(theme.accent);
+    return (
+    <div style={{ position: 'relative', overflow: 'hidden', background: theme.accent, color: textColor, padding: 'clamp(48px, 8vw, 76px) 24px', textAlign: 'center' }}>
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.08, backgroundImage: `radial-gradient(${textColor} 1.5px, transparent 1.5px)`, backgroundSize: '22px 22px', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative' }}>
+            <div style={{ width: 52, height: 52, borderRadius: '50%', background: `${textColor}1a`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <CalendarCheck size={24} />
+            </div>
+            <h2 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, marginBottom: 28, letterSpacing: -0.5 }}>{cta.title}</h2>
+            <button onClick={onReserve} style={{ background: textColor, color: theme.accent, border: 'none', padding: '16px 36px', borderRadius: 99, fontSize: 15, fontWeight: 800, cursor: 'pointer', letterSpacing: 0.3, transition: 'transform .2s, box-shadow .2s', boxShadow: `0 8px 24px rgba(0,0,0,0.15)` }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
+                {cta.buttonText}
+            </button>
+        </div>
     </div>
-);
+);};
 
 function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme, onReserve }) {
   const cats = Object.keys(menu);
@@ -154,7 +166,7 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
         </div>
       </div>
       <CTASection cta={cta} theme={t} onReserve={onReserve} />
-      <Footer restaurant={restaurant} theme={t} />
+      <Footer restaurant={restaurant} theme={t} activeTheme={activeTheme} />
     </div>
   );
 }
@@ -233,7 +245,7 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
         })}
       </div>
       <CTASection cta={cta} theme={t} onReserve={onReserve} />
-      <Footer restaurant={restaurant} theme={t} />
+      <Footer restaurant={restaurant} theme={t} activeTheme={activeTheme} />
     </div>
   );
 }
@@ -278,7 +290,9 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           {(menu[currentCat] || []).map((item, i) => {
             const qty = cart.items.find(x => x.id === item.id)?.qty || 0;
             return (
-              <div key={item.id} className="theme3-zigzag" style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '24px', background: t.card, borderRadius: t.cardRadius, border: `1px solid ${t.border}`, boxShadow: '0 8px 30px rgba(0,0,0,0.03)' }}>
+              <div key={item.id} className="theme3-zigzag" style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '24px', background: t.card, borderRadius: t.cardRadius, border: `1px solid ${t.border}`, boxShadow: '0 8px 30px rgba(0,0,0,0.03)', transition: 'transform .3s, box-shadow .3s' }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.08)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.03)'; }}>
                 <div style={{ height: 180, borderRadius: 8, overflow: 'hidden', flexShrink: 0 }}>
                   <img onClick={() => { setSelectedItem(item); setView('item-detail'); }} src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }} />
                 </div>
@@ -308,7 +322,7 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
         </div>
       </div>
       <CTASection cta={cta} theme={t} onReserve={onReserve} />
-      <Footer restaurant={restaurant} theme={t} />
+      <Footer restaurant={restaurant} theme={t} activeTheme={activeTheme} />
     </div>
   );
 }
@@ -385,7 +399,7 @@ function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
         </div>
       </div>
       <CTASection cta={cta} theme={t} onReserve={onReserve} />
-      <Footer restaurant={restaurant} theme={t} />
+      <Footer restaurant={restaurant} theme={t} activeTheme={activeTheme} />
     </div>
   );
 }
@@ -399,11 +413,11 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.bodyFont || 'Inter, sans-serif' }}>
-      <div style={{ position: 'relative', height: 620, overflow: 'hidden' }}>
+      <div style={{ position: 'relative', minHeight: 480, height: 'clamp(480px, 80vh, 620px)', overflow: 'hidden' }}>
         <img src={hero.image}
           alt="hero" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(28,26,21,0.9) 30%, rgba(28,26,21,0.3) 100%)' }}></div>
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 80px', maxWidth: 700 }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(24px, 6vw, 80px)', maxWidth: 700 }}>
           <div style={{ fontFamily: hero.font || t.font, fontSize: 13, letterSpacing: 8, color: t.accent2, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 12 }}>
              <Palmtree size={18} /> {hero.tagline}
           </div>
@@ -425,7 +439,7 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
         </div>
       </div>
 
-      <div style={{ background: t.accent, padding: '24px 64px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 60, flexWrap: 'wrap' }}>
+      <div style={{ background: t.accent, padding: '20px clamp(20px, 6vw, 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(20px, 5vw, 60px)', flexWrap: 'wrap' }}>
         {[
           { label: 'Authentique', icon: Leaf },
           { label: 'Produits locaux', icon: Palmtree },
@@ -502,13 +516,13 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
 
       <div style={{ background: '#1C1A15', color: 'rgba(250,248,243,.4)', textAlign: 'center', padding: '60px 24px', fontSize: 13, letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'Inter, sans-serif' }}>
         <div style={{ color: t.accent2, marginBottom: 16, fontFamily: t.font, fontSize: 22, fontStyle: 'italic' }}>{restaurant.name}</div>
-        <div style={{ marginBottom: 20 }}>{restaurant.footer?.address || ''} · {restaurant.footer?.phone || ''}</div>
+        <div style={{ marginBottom: 20 }}>{restaurant.config?.[activeTheme]?.footer?.address || ''} · {restaurant.config?.[activeTheme]?.footer?.phone || ''}</div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 24, color: 'rgba(250,248,243,.2)' }}>
            <Star size={16} /> <Star size={16} /> <Star size={16} />
         </div>
       </div>
       <CTASection cta={cta} theme={t} onReserve={onReserve} />
-      <Footer restaurant={restaurant} theme={t} />
+      <Footer restaurant={restaurant} theme={t} activeTheme={activeTheme} />
     </div>
   );
 }
@@ -534,18 +548,28 @@ export default function LandingPage({ menu, cart, onAdd, activeTheme, setActiveT
       <ActiveTheme menu={menu} onAdd={onAdd} cart={cart} restaurant={restaurant} theme={adjustedTheme} setSelectedItem={setSelectedItem} setView={setView} activeTheme={activeTheme} onReserve={onReserve} />
       <div style={{ position: 'fixed', left: 20, bottom: 20, zIndex: 100 }}>
         <button onClick={() => setShowSwitcher(!showSwitcher)}
-          style={{ width: 50, height: 50, borderRadius: '50%', background: adjustedTheme.accent, border: 'none', color: getContrastColor(adjustedTheme.accent), display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>
-          <Palette />
+          style={{ width: 50, height: 50, borderRadius: '50%', background: adjustedTheme.accent, border: 'none', color: getContrastColor(adjustedTheme.accent), display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: `0 6px 20px ${adjustedTheme.accent}55`, transition: 'transform .2s' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08) rotate(20deg)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
+          <Palette size={20} />
         </button>
         {showSwitcher && (
-          <div style={{ position: 'absolute', bottom: 60, left: 0, background: '#fff', borderRadius: 8, padding: 10, boxShadow: '0 4px 10px rgba(0,0,0,0.2)', width: 200 }}>
-            {Object.values(THEMES).map(th => (
-              <button key={th.id} onClick={() => { setActiveTheme(th.id); setShowSwitcher(false); }}
-                style={{ display: 'block', width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: '10px', cursor: 'pointer', color: '#000' }}>
-                {th.name}
-              </button>
-            ))}
-          </div>
+          <>
+            <div onClick={() => setShowSwitcher(false)} style={{ position: 'fixed', inset: 0, zIndex: -1 }} />
+            <div style={{ position: 'absolute', bottom: 62, left: 0, background: '#fff', borderRadius: 14, padding: 8, boxShadow: '0 12px 32px rgba(0,0,0,0.18)', width: 210, border: '1px solid #eee' }}>
+              <div style={{ color: '#999', fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', padding: '8px 10px 4px' }}>Templates</div>
+              {Object.values(THEMES).map(th => {
+                const isActive = th.id === activeTheme;
+                return (
+                  <button key={th.id} onClick={() => { setActiveTheme(th.id); setShowSwitcher(false); }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', background: isActive ? `${th.accent}14` : 'none', border: 'none', borderRadius: 8, padding: '10px', cursor: 'pointer', color: isActive ? th.accent : '#333', fontWeight: isActive ? 700 : 500, fontSize: 13 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: th.accent, flexShrink: 0 }} />
+                    {th.name}
+                  </button>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
     </div>

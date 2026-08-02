@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { D_DARK, D_LIGHT, dFont, THEMES, RESTAURANT } from '../data/index.js';
-import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, Menu, X, MapPin, Settings } from 'lucide-react';
+import { D_DARK, D_LIGHT, dFont, THEMES } from '../data/index.js';
+import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, Menu, X, MapPin, Settings, Wallet, CalendarCheck, User, Phone, Users, Calendar, Clock, CreditCard, StickyNote } from 'lucide-react';
 import { useMediaQuery } from '../hooks/index.js';
 
 
@@ -18,7 +18,7 @@ const getContrastColor = (hexColor) => {
   return (yiq >= 128) ? '#000' : '#fff';
 };
 
-export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode, restaurant, setRestaurant, showToast, customThemeColors, setCustomThemeColors, archivedOrders }) {
+export default function Dashboard({ menu, setMenu, orders, updateStatus, markPaid, deleteOrder, activeTheme, setActiveTheme, isDarkMode, setIsDarkMode, restaurant, setRestaurant, showToast, customThemeColors, setCustomThemeColors, archivedOrders, tables, tableStatus, setTableStatus, reservations, deleteReservation }) {
   const t = THEMES[activeTheme];
   const D = isDarkMode ? D_DARK : D_LIGHT;
   const accent = customThemeColors[activeTheme] || t.accent || D.gold;
@@ -36,7 +36,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
   }, [restaurant]);
 
   const s = {
-    sectionTitle: { color: D.text, fontSize: 18, fontWeight: 700, marginBottom: 20 },
+    sectionTitle: { color: D.text, fontSize: 20, fontWeight: 800, marginBottom: 20, letterSpacing: -0.3 },
     input: { width: '100%', background: D.bg, border: `1px solid ${D.border}`, borderRadius: 8, padding: '10px 14px', color: D.text, fontFamily: dFont, fontSize: 13, outline: 'none' },
   };
 
@@ -71,7 +71,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
     if (showToast) showToast('Configuration enregistrée !');
   };
 
-  const tables = ['Tous', ...new Set(orders.map(o => o.table))];
+  const orderTableFilters = ['Tous', ...new Set(orders.map(o => o.table))];
   const filteredOrders = selectedTable === 'Tous' ? orders : orders.filter(o => o.table === selectedTable);
 
   const pending = orders.filter(o => o.status === 'en attente').length;
@@ -86,24 +86,27 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
   };
   const STATUS_LIST = Object.keys(STATUS_COLORS);
   const allOrders = [...orders, ...archivedOrders];
-  const totalRevenue = allOrders.filter(o => o.status === 'servi').reduce((s, o) => s + o.total, 0);
+  const totalRevenue = allOrders.filter(o => o.paid).reduce((s, o) => s + o.total, 0);
 
   const StatCard = ({ label, value, sub, color, icon: Icon }) => (
-    <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: '22px 24px', borderTop: `3px solid ${color}` }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <span style={{ color: D.muted, fontSize: 12, letterSpacing: 1, textTransform: 'uppercase' }}>{label}</span>
-        <Icon size={22} style={{ color }} />
+    <div style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: '22px 24px', boxShadow: isDarkMode ? 'none' : '0 1px 3px rgba(0,0,0,0.04)', transition: 'transform .18s, box-shadow .18s' }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 10px 24px ${isDarkMode ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.08)'}`; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = isDarkMode ? 'none' : '0 1px 3px rgba(0,0,0,0.04)'; }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <span style={{ color: D.muted, fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>{label}</span>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Icon size={18} style={{ color }} />
+        </div>
       </div>
-      <div style={{ color: D.text, fontSize: 28, fontWeight: 800, marginBottom: 4 }}>{value}</div>
+      <div style={{ color: D.text, fontSize: 26, fontWeight: 800, marginBottom: 4, letterSpacing: -0.5 }}>{value}</div>
       {sub && <div style={{ color: D.muted, fontSize: 12 }}>{sub}</div>}
     </div>
   );
 
-  const getTableStatus = (tableName) => {
-    const tableOrders = orders.filter(o => o.table === tableName && o.status !== 'servi');
-    if (tableOrders.length === 0) return 'libre';
-    if (tableOrders.some(o => o.status === 'en attente' || o.status === 'en cours')) return 'occupée';     
-    return 'prêt';
+  const [openTableMenu, setOpenTableMenu] = useState(null);
+
+  const reservationForTable = (tableName) => {
+    return [...reservations].reverse().find(r => r.tables?.includes(tableName));
   };
 
   return (
@@ -118,7 +121,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
         position: isMobile ? 'absolute' : 'static', height: '100%', zIndex: 150, transform: isMobile && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)', transition: 'transform .3s' }}>
         <div style={{ padding: '24px 20px', borderBottom: `1px solid ${D.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isMobile ? 60 : 0 }}>
           <div>
-            <div style={{ color: accent, fontSize: 16, fontWeight: 800 }}>{RESTAURANT.name}</div>
+            <div style={{ color: accent, fontSize: 16, fontWeight: 800 }}>{restaurant.name}</div>
             <div style={{ color: D.muted, fontSize: 11 }}>Admin</div>
           </div>
           <button onClick={() => setIsDarkMode(!isDarkMode)} style={{ background: D.bg, border: 'none', borderRadius: 8, padding: 8, cursor: 'pointer', color: D.text }}>
@@ -130,6 +133,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
           {[
             { id: 'orders', label: 'Commandes', icon: ClipboardList, count: orders.filter(o => o.status !== 'servi').length },
             { id: 'floor',  label: 'Plan Salle', icon: Map },
+            { id: 'reservations', label: 'Réservations', icon: CalendarCheck, count: reservations.length },
             { id: 'stats',  label: 'Statistiques', icon: BarChart3 },
             { id: 'menu',   label: 'Menu', icon: Utensils },
             { id: 'themes', label: 'Templates', icon: Palette },
@@ -161,7 +165,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                 <h2 style={s.sectionTitle}>Commandes en cours</h2>
                 <select value={selectedTable} onChange={e => setSelectedTable(e.target.value)}
                   style={{ background: D.card, color: D.text, border: `1px solid ${D.border}`, borderRadius: 8, padding: '8px 16px', fontFamily: dFont, fontSize: 13, cursor: 'pointer', outline: 'none' }}>
-                  {tables.map(t => <option key={t} value={t}>{t}</option>)}
+                  {orderTableFilters.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(auto-fit, minmax(150px, 1fr))' : 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
@@ -175,47 +179,71 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                     <p style={{ fontSize: 18 }}>Aucune commande pour {selectedTable === 'Tous' ? 'le moment' : selectedTable}.</p>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {filteredOrders.map(order => (
-                      <div key={order.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: isMobile ? '16px' : '18px 22px', borderLeft: `4px solid ${STATUS_COLORS[order.status] || D.muted}` }}>
-                        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', marginBottom: 12, gap: isMobile ? 12 : 0 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    {filteredOrders.map(order => {
+                      const statusColor = STATUS_COLORS[order.status] || D.muted;
+                      return (
+                      <div key={order.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 16, overflow: 'hidden', boxShadow: isDarkMode ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' }}>
+                        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', padding: isMobile ? '14px 16px' : '16px 20px', gap: isMobile ? 12 : 0, borderBottom: `1px solid ${D.border}` }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                            <span style={{ color: D.text, fontWeight: 800, fontSize: 15 }}>{order.id}</span>
-                            <span style={{ background: D.bg, color: D.muted, fontSize: 12, padding: '3px 10px', borderRadius: 99 }}>{order.table}</span>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: `${statusColor}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <Utensils size={17} style={{ color: statusColor }} />
+                            </div>
+                            <div>
+                              <div style={{ color: D.text, fontWeight: 800, fontSize: 15, lineHeight: 1.3 }}>{order.table}</div>
+                              <div style={{ color: D.muted, fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, marginTop: 2 }}>
+                                {order.id} {order.timestamp && <><span style={{opacity: 0.5}}>·</span> <Clock size={11} /> {order.timestamp}</>}
+                              </div>
+                            </div>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'space-between' : 'flex-end', flexWrap: 'wrap' }}>
                             <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)} disabled={order.status === 'servi'}
-                              style={{ background: `${STATUS_COLORS[order.status]}22`, color: STATUS_COLORS[order.status], border: `1px solid ${STATUS_COLORS[order.status]}44`, borderRadius: 99, padding: '5px 12px', fontFamily: dFont, fontSize: 12, fontWeight: 700, cursor: order.status === 'servi' ? 'not-allowed' : 'pointer', outline: 'none', opacity: order.status === 'servi' ? 0.6 : 1 }}>
+                              style={{ background: `${statusColor}18`, color: statusColor, border: `1px solid ${statusColor}44`, borderRadius: 99, padding: '6px 14px', fontFamily: dFont, fontSize: 12, fontWeight: 700, cursor: order.status === 'servi' ? 'not-allowed' : 'pointer', outline: 'none', opacity: order.status === 'servi' ? 0.7 : 1 }}>
                               {STATUS_LIST.map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
-                            <span style={{ color: D.gold, fontWeight: 800, fontSize: 16 }}>{fmt(order.total)}</span>
-                            <button onClick={() => deleteOrder(order.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.red }}>
-                              <Trash2 size={16} />
+                            <button onClick={() => deleteOrder(order.id)} style={{ background: D.bg, border: `1px solid ${D.border}`, borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: D.muted, flexShrink: 0 }}>
+                              <Trash2 size={14} />
                             </button>
                           </div>
                         </div>
-                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                          {order.items.map((it, i) => (
-                            <span key={i} style={{ background: D.bg, color: D.muted, fontSize: 12, padding: '4px 12px', borderRadius: 99, border: `1px solid ${D.border}` }}>
-                              {it.qty}× {it.name}
-                            </span>
-                          ))}
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+
+                        <div style={{ padding: isMobile ? '14px 16px' : '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            {order.items.map((it, i) => (
+                              <span key={i} style={{ background: D.bg, color: D.text, fontSize: 12, fontWeight: 600, padding: '5px 12px', borderRadius: 99, border: `1px solid ${D.border}` }}>
+                                <span style={{ color: accent, fontWeight: 800 }}>{it.qty}×</span> {it.name}
+                              </span>
+                            ))}
+                          </div>
                           {order.comment && (
-                              <div style={{ background: D.gold + '22', color: D.gold, fontSize: 12, padding: '4px 12px', borderRadius: 99, border: `1px solid ${D.gold}44` }}>
-                                  Note: {order.comment}
-                              </div>
-                          )}
-                          <div style={{ fontSize: 12, color: D.muted }}>Paiement: {order.paymentMethod}</div>
-                          {order.paymentMethod !== 'Cash' && order.status === 'en attente' && (
-                              <button onClick={() => updateStatus(order.id, 'servi')} style={{ background: D.green, color: '#fff', border: 'none', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
-                                  Marquer comme Payé
-                              </button>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, color: D.gold, fontSize: 12, background: `${D.gold}14`, padding: '8px 12px', borderRadius: 10 }}>
+                              <StickyNote size={14} style={{ flexShrink: 0, marginTop: 1 }} />
+                              <span>{order.comment}</span>
+                            </div>
                           )}
                         </div>
+
+                        <div style={{ padding: isMobile ? '12px 16px' : '14px 20px', background: D.bg, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: D.muted, fontSize: 12, fontWeight: 600 }}>
+                            <CreditCard size={13} /> {order.paymentMethod}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                            <span style={{ color: D.text, fontWeight: 800, fontSize: 17 }}>{fmt(order.total)}</span>
+                            {order.paid ? (
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: D.green, fontSize: 12, fontWeight: 800, background: `${D.green}18`, padding: '7px 14px', borderRadius: 99 }}>
+                                <CheckCircle size={14} /> Encaissé
+                              </span>
+                            ) : order.status === 'servi' ? (
+                              <button onClick={() => markPaid(order.id)} style={{ background: accent, color: isDarkMode ? '#000' : '#fff', border: 'none', padding: '9px 18px', borderRadius: 99, cursor: 'pointer', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6, boxShadow: `0 2px 10px ${accent}44` }}>
+                                  <Wallet size={14} /> Encaisser
+                              </button>
+                            ) : (
+                              <span style={{ fontSize: 11, color: D.muted, fontStyle: 'italic' }}>En attente de service</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    ))}
+                    );})}
                   </div>
                 )}
             </div>
@@ -223,19 +251,83 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
           {tab === 'floor' && (
             <div>
                 <h2 style={s.sectionTitle}>Plan de Salle</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 20 }}>
-                    {['Table 1', 'Table 2', 'Table 3', 'Table 4', 'Table 5', 'Table 6', 'Table 7', 'Table 8'].map(tableName => {
-                        const status = getTableStatus(tableName);
-                        const colors = { libre: D.muted, occupée: D.gold, prêt: D.green };
+                <p style={{ color: D.muted, fontSize: 12, marginTop: -12, marginBottom: 20 }}>Cliquez sur une table pour changer son statut manuellement.</p>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(auto-fill, minmax(120px, 1fr))' : 'repeat(auto-fill, minmax(150px, 1fr))', gap: 16 }}>
+                    {tables.map(tableName => {
+                        const status = tableStatus[tableName] || 'libre';
+                        const colors = { libre: D.green, occupée: D.gold, 'réservée': D.blue };
+                        const c = colors[status] || D.muted;
+                        const res = status === 'réservée' ? reservationForTable(tableName) : null;
+                        const isOpen = openTableMenu === tableName;
                         return (
-                            <div key={tableName} style={{ background: D.card, padding: 20, borderRadius: 12, textAlign: 'center', border: `2px solid ${colors[status] || colors.libre}` }}>
-                                <Utensils style={{ color: colors[status] || colors.libre, marginBottom: 8 }} />
-                                <div style={{ color: D.text, fontWeight: 700 }}>{tableName}</div>
-                                <div style={{ color: colors[status] || colors.libre, fontSize: 11, textTransform: 'uppercase' }}>{status}</div>
+                            <div key={tableName} style={{ position: 'relative' }}>
+                                <div onClick={() => setOpenTableMenu(isOpen ? null : tableName)}
+                                    style={{ background: D.card, padding: 18, borderRadius: 12, textAlign: 'center', border: `2px solid ${c}`, cursor: 'pointer', transition: 'all .15s' }}>
+                                    <Utensils style={{ color: c, marginBottom: 8 }} />
+                                    <div style={{ color: D.text, fontWeight: 700 }}>{tableName}</div>
+                                    <div style={{ color: c, fontSize: 11, textTransform: 'uppercase', fontWeight: 700, letterSpacing: 0.5 }}>{status}</div>
+                                    {res && <div style={{ color: D.muted, fontSize: 10, marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{res.firstName} {res.lastName}</div>}
+                                </div>
+                                {isOpen && (
+                                    <>
+                                        <div onClick={() => setOpenTableMenu(null)} style={{ position: 'fixed', inset: 0, zIndex: 60 }} />
+                                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 6, background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, boxShadow: '0 10px 30px rgba(0,0,0,0.25)', zIndex: 61, overflow: 'hidden' }}>
+                                            {res && (
+                                                <div style={{ padding: '10px 14px', borderBottom: `1px solid ${D.border}`, fontSize: 11, color: D.muted, lineHeight: 1.6 }}>
+                                                    <div style={{ color: D.text, fontWeight: 700 }}>{res.firstName} {res.lastName}</div>
+                                                    <div>{res.phone}</div>
+                                                    <div>{res.date} · {res.time} · {res.guests} pers.</div>
+                                                </div>
+                                            )}
+                                            {['libre', 'occupée', 'réservée'].map(opt => (
+                                                <button key={opt} onClick={() => { setTableStatus(tableName, opt); setOpenTableMenu(null); }}
+                                                    style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: status === opt ? `${accent}18` : 'transparent', border: 'none', color: status === opt ? accent : D.text, fontFamily: dFont, fontSize: 12, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize' }}>
+                                                    {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         );
                     })}
                 </div>
+            </div>
+          )}
+          {tab === 'reservations' && (
+            <div>
+                <h2 style={s.sectionTitle}>Réservations</h2>
+                {reservations.length === 0 ? (
+                    <div style={{ textAlign: 'center', color: D.muted, marginTop: 60 }}>
+                        <CalendarCheck size={32} style={{ marginBottom: 12, opacity: 0.5 }} />
+                        <p>Aucune réservation pour le moment.</p>
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {[...reservations].reverse().map(r => (
+                            <div key={r.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 14, padding: isMobile ? 16 : '18px 22px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: 14 }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: D.text, fontWeight: 800, fontSize: 15 }}>
+                                        <User size={15} style={{ color: accent }} /> {r.firstName} {r.lastName}
+                                    </div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, color: D.muted, fontSize: 12 }}>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Phone size={12} /> {r.phone}</span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Calendar size={12} /> {r.date}</span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Clock size={12} /> {r.time}</span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Users size={12} /> {r.guests} pers.</span>
+                                    </div>
+                                    {r.address && <div style={{ color: D.muted, fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}><MapPin size={12} /> {r.address}</div>}
+                                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+                                        {(r.tables || []).map(t => <span key={t} style={{ background: `${accent}18`, color: accent, fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 99 }}>{t}</span>)}
+                                    </div>
+                                </div>
+                                <button onClick={() => deleteReservation(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.red, alignSelf: isMobile ? 'flex-end' : 'flex-start' }}>
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
           )}
           {tab === 'stats' && (
@@ -254,18 +346,18 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                     link.click();
                 }} style={{ background: accent, color: '#fff', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Exporter CSV</button>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(220px,1fr))', gap: 16, marginBottom: 28 }}>
                 <StatCard label="Chiffre semaine" value={`${totalRevenue.toLocaleString()} FCFA`} icon={TrendingUp} color={D.green} />
                 <StatCard label="Commandes mois" value={orders.length} icon={Receipt} color={D.blue} />
                 <StatCard label="Panier moyen" value={fmt(totalRevenue / (orders.length || 1))} icon={Utensils} color={D.purple} />
               </div>
               <h3 style={{...s.sectionTitle, fontSize: 16}}>Ventes par catégories</h3>
-              <div style={{background: D.card, padding: 20, borderRadius: 12}}>
-                  {Object.keys(menu).map(cat => {
+              <div style={{background: D.card, border: `1px solid ${D.border}`, padding: '8px 20px', borderRadius: 12}}>
+                  {Object.keys(menu).map((cat, i, arr) => {
                       const sales = orders.reduce((acc, o) => acc + o.items.filter(i => menu[cat].find(m => m.id === i.id)).reduce((a, b) => a + b.price * b.qty, 0), 0);
-                      return <div key={cat} style={{display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: `1px solid ${D.border}`}}>
-                          <span>{cat}</span>
-                          <span style={{fontWeight: 700}}>{fmt(sales)}</span>
+                      return <div key={cat} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: i === arr.length - 1 ? 'none' : `1px solid ${D.border}`}}>
+                          <span style={{ color: D.text, fontSize: 14, fontWeight: 600 }}>{cat}</span>
+                          <span style={{ color: accent, fontWeight: 800, fontSize: 14 }}>{fmt(sales)}</span>
                       </div>
                   })}
               </div>
@@ -293,10 +385,13 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                   <div style={{ color: accent, fontSize: 13, fontWeight: 700, marginBottom: 12 }}>{cat}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {(items || []).map(item => (
-                      <div key={item.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                        <div style={{ flex: 1 }}>{item.name}</div>
-                        <button onClick={() => setEditItem(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><Pencil size={16} color={D.blue} /></button>
-                        <button onClick={() => setMenu(prev => ({ ...prev, [cat]: prev[cat].filter(i => i.id !== item.id) }))} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><Trash2 size={16} color={D.red} /></button>
+                      <div key={item.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14, transition: 'border-color .15s' }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ color: D.text, fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                          <div style={{ color: D.muted, fontSize: 12, marginTop: 2 }}>{fmt(item.price)}</div>
+                        </div>
+                        <button onClick={() => setEditItem(item.id)} style={{ background: D.bg, border: `1px solid ${D.border}`, borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}><Pencil size={14} color={D.blue} /></button>
+                        <button onClick={() => setMenu(prev => ({ ...prev, [cat]: prev[cat].filter(i => i.id !== item.id) }))} style={{ background: D.bg, border: `1px solid ${D.border}`, borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}><Trash2 size={14} color={D.red} /></button>
                       </div>
                     ))}
                   </div>
@@ -308,16 +403,25 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
             <div>
               <h2 style={s.sectionTitle}>Templates</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20 }}>
-                {Object.values(THEMES).map(th => (
+                {Object.values(THEMES).map(th => {
+                  const isActive = activeTheme === th.id;
+                  return (
                   <div key={th.id} onClick={() => setActiveTheme(th.id)}
-                    style={{ background: th.card, border: `3px solid ${activeTheme === th.id ? (customThemeColors[th.id] || th.accent) : D.border}`, borderRadius: 14, padding: 20, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    style={{ background: th.card, border: `2px solid ${isActive ? (customThemeColors[th.id] || th.accent) : D.border}`, borderRadius: 16, padding: 20, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 10, position: 'relative', boxShadow: isActive ? `0 8px 24px ${(customThemeColors[th.id] || th.accent)}33` : 'none', transition: 'all .2s' }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
+                    {isActive && (
+                      <div style={{ position: 'absolute', top: 12, right: 12, background: customThemeColors[th.id] || th.accent, color: getContrastColor(customThemeColors[th.id] || th.accent), width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <CheckCircle size={14} />
+                      </div>
+                    )}
                     <div style={{ fontSize: 40 }}>{th.preview.split(' ')[0]}</div>
                     <div>
                       <div style={{ color: th.text, fontWeight: 700 }}>{th.name}</div>
                       <div style={{ color: D.muted, fontSize: 12 }}>{th.sub}</div>
                     </div>
                   </div>
-                ))}
+                );})}
               </div>
               
               {[2, 3, 4].includes(activeTheme) && (
@@ -334,7 +438,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
             </div>
           )}
           {tab === 'config' && (
-            <div style={{display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20}}>
+            <div style={{display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 300px', gap: 20}}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                     <h2 style={s.sectionTitle}>Configurations ({t.name})</h2>
@@ -405,7 +509,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                 {/* Footer Config */}
                 <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
                     <h3 style={{...s.sectionTitle, fontSize: 16, marginBottom: 15}}>Footer & Logo</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20 }}>
                         <div>
                             <label style={{ color: D.muted, fontSize: 12, marginBottom: 8, display: 'block' }}>Logo</label>
                             <input type="file" accept="image/*" onChange={(e) => {
@@ -420,9 +524,6 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                             }} style={{...s.input, marginBottom: 10}} />
 
                             <label style={{ color: D.muted, fontSize: 12 }}>Nom du restaurant</label>
-                            <input value={draftRestaurant.name} onChange={e => setDraftRestaurant(prev => ({...prev, name: e.target.value}))} style={{...s.input, marginBottom: 10}} />
-
-                            <label style={{ color: D.muted, fontSize: 12 }}>Adresse</label>
                             <input value={draftRestaurant.name} onChange={e => setDraftRestaurant(prev => ({...prev, name: e.target.value}))} style={{...s.input, marginBottom: 10}} />
 
                             <label style={{ color: D.muted, fontSize: 12 }}>Adresse</label>
@@ -451,8 +552,8 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
               </div>
               <div style={{ position: 'sticky', top: 20 }}>
                 <h3 style={{...s.sectionTitle, fontSize: 14}}>Aperçu</h3>
-                <div style={{ background: D.card, padding: 20, borderRadius: 12 }}>
-                    <div style={{fontSize: 12, fontWeight: 700, marginBottom: 10}}>Hero</div>
+                <div style={{ background: D.card, border: `1px solid ${D.border}`, padding: 20, borderRadius: 12 }}>
+                    <div style={{color: D.muted, fontSize: 11, fontWeight: 700, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase'}}>Hero</div>
                     <div style={{ height: 150, background: '#000', borderRadius: 8, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 10 }}>
                         <div style={{ position: 'absolute', inset: 0, background: `url(${draftRestaurant.config[activeTheme]?.hero?.image || ''}) center/cover`, filter: 'brightness(.4)' }} />
                         <div style={{position: 'relative', color: '#fff'}}>
@@ -460,12 +561,12 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, deleteO
                             <p style={{fontSize: 10, margin: '4px 0'}}>{draftRestaurant.config[activeTheme]?.hero?.tagline || 'Tagline'}</p>
                         </div>
                     </div>
-                    <div style={{fontSize: 12, fontWeight: 700, marginTop: 20, marginBottom: 10}}>CTA</div>
+                    <div style={{color: D.muted, fontSize: 11, fontWeight: 700, marginTop: 20, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase'}}>CTA</div>
                     <div style={{ background: accent, color: getContrastColor(accent), padding: 15, borderRadius: 8, fontSize: 10, textAlign: 'center' }}>
                         <div style={{fontWeight: 700, marginBottom: 5}}>{draftRestaurant.config[activeTheme]?.cta?.title || 'Titre CTA'}</div>
                         <div style={{background: 'rgba(0,0,0,0.2)', padding: '5px 10px', borderRadius: 4, display: 'inline-block'}}>{draftRestaurant.config[activeTheme]?.cta?.buttonText || 'Bouton'}</div>
                     </div>
-                    <div style={{fontSize: 12, fontWeight: 700, marginTop: 20, marginBottom: 10}}>Footer</div>
+                    <div style={{color: D.muted, fontSize: 11, fontWeight: 700, marginTop: 20, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase'}}>Footer</div>
                     <div style={{ background: '#1c1c1c', color: '#fff', padding: 15, borderRadius: 8, fontSize: 10, textAlign: 'center' }}>
                         {draftRestaurant.logo && <img src={draftRestaurant.logo} style={{height: 30, marginBottom: 5}} alt="Logo" />}
                         <div style={{fontWeight: 700, marginBottom: 2}}>{draftRestaurant.name}</div>
