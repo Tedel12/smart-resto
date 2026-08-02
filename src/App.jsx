@@ -12,7 +12,16 @@ import AlertModal from './components/AlertModal.jsx';
 
 const Nav = ({ restaurant, accent, accentText, currentTheme, navBg, navBorder, view, setView, setShowCart, cart, activeTheme, isMobile }) => {
     const rawLayout = restaurant.config[activeTheme]?.navLayout || 1;
-    const layout = isMobile && rawLayout === 3 ? 1 : rawLayout;
+    const layout = isMobile && (rawLayout === 3 || rawLayout === 7) ? 1 : rawLayout;
+
+    const [scrolled, setScrolled] = useState(false);
+    useEffect(() => {
+        if (layout !== 6) return;
+        const onScroll = () => setScrolled(window.scrollY > 40);
+        onScroll();
+        window.addEventListener('scroll', onScroll);
+        return () => window.removeEventListener('scroll', onScroll);
+    }, [layout]);
 
     const navStyle = (centered = false) => ({
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 150,
@@ -53,7 +62,125 @@ const Nav = ({ restaurant, accent, accentText, currentTheme, navBg, navBorder, v
         </>
     );
 
+    // Layout 3 — Sidebar
     if (layout === 3) return <nav style={{...navStyle(), flexDirection: 'column', alignItems: 'stretch', height: '100vh', width: 200, left: 0, right: 'auto', padding: '20px 16px', gap: 20}}><NavContent /></nav>;
+
+    // Layout 4 — Flottante (glass pill)
+    if (layout === 4) return (
+        <nav style={{
+            position: 'fixed', top: isMobile ? 10 : 16, left: isMobile ? 10 : 20, right: isMobile ? 10 : 20, zIndex: 150,
+            background: navBg, backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
+            border: `1px solid ${navBorder}`, borderRadius: 99, boxShadow: '0 10px 40px rgba(0,0,0,0.18)',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: isMobile ? '0 8px 0 14px' : '0 10px 0 20px', height: 56, gap: 8,
+        }}><NavContent /></nav>
+    );
+
+    // Layout 5 — Barre basse (mobile app)
+    if (layout === 5) return (
+        <>
+            <div style={{ position: 'fixed', top: 14, left: 14, zIndex: 150, display: 'flex', alignItems: 'center', gap: 8,
+                background: navBg, backdropFilter: 'blur(12px)', border: `1px solid ${navBorder}`, borderRadius: 99, padding: '8px 16px 8px 10px', boxShadow: '0 6px 20px rgba(0,0,0,0.15)' }}>
+                {restaurant.logo ? (
+                    <img src={restaurant.logo} alt="Logo" style={{ height: 24, width: 24, objectFit: 'contain', borderRadius: 4 }} />
+                ) : (
+                    <Trees size={16} style={{ color: accent }} />
+                )}
+                <span style={{ color: accent, fontWeight: 800, fontSize: 13, whiteSpace: 'nowrap', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis' }}>{restaurant.name}</span>
+            </div>
+            <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 150, background: navBg, backdropFilter: 'blur(18px)',
+                borderTop: `1px solid ${navBorder}`, display: 'flex', alignItems: 'stretch', justifyContent: 'space-around', height: 64, boxShadow: '0 -6px 24px rgba(0,0,0,0.12)' }}>
+                {[
+                    { id: 'landing', label: 'Vitrine', icon: Globe, onClick: () => setView('landing') },
+                    { id: 'cart', label: 'Panier', icon: ShoppingCart, onClick: () => setShowCart(true), badge: cart.count },
+                    { id: 'dashboard', label: 'Admin', icon: Settings, onClick: () => setView('dashboard') },
+                ].map(tab => {
+                    const active = view === tab.id;
+                    return (
+                        <button key={tab.id} onClick={tab.onClick} style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, color: active ? accent : currentTheme.muted, position: 'relative' }}>
+                            <tab.icon size={20} />
+                            <span style={{ fontSize: 10, fontWeight: 700 }}>{tab.label}</span>
+                            {tab.badge > 0 && <span style={{ position: 'absolute', top: 4, right: '30%', background: currentTheme.danger || '#FF4757', color: '#fff', borderRadius: '50%', width: 16, height: 16, fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{tab.badge}</span>}
+                        </button>
+                    );
+                })}
+            </nav>
+        </>
+    );
+
+    // Layout 6 — Transparente puis solide au scroll
+    if (layout === 6) {
+        const transparent = !scrolled;
+        const fg = transparent ? '#FFFFFF' : accent;
+        const fgMuted = transparent ? 'rgba(255,255,255,0.75)' : currentTheme.muted;
+        return (
+            <nav style={{
+                position: 'fixed', top: 0, left: 0, right: 0, zIndex: 150,
+                background: transparent ? 'transparent' : navBg, backdropFilter: transparent ? 'none' : 'blur(12px)',
+                borderBottom: `1px solid ${transparent ? 'transparent' : navBorder}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: isMobile ? '0 10px' : '0 16px', height: 56, transition: 'all .3s', gap: 8,
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                    {restaurant.logo ? (
+                        <img src={restaurant.logo} alt="Logo" style={{ height: 30, width: 30, objectFit: 'contain', borderRadius: 4, flexShrink: 0 }} />
+                    ) : (
+                        <Trees size={18} style={{ color: fg, flexShrink: 0 }} />
+                    )}
+                    <span style={{ color: fg, fontWeight: 800, fontSize: isMobile ? 14 : 16, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: isMobile ? 100 : 260, transition: 'color .3s' }}>{restaurant.name}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 2 : 8, flexShrink: 0 }}>
+                    <button onClick={() => setView('landing')} title="Vitrine" style={{ background: view === 'landing' ? `${fg}22` : 'none', color: view === 'landing' ? fg : fgMuted, border: 'none', padding: isMobile ? '6px' : '6px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, transition: 'color .3s' }}>
+                        <Globe size={14} /> {!isMobile && 'Vitrine'}
+                    </button>
+                    <button onClick={() => setView('dashboard')} title="Admin" style={{ background: view === 'dashboard' ? `${fg}22` : 'none', color: view === 'dashboard' ? fg : fgMuted, border: 'none', padding: isMobile ? '6px' : '6px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, transition: 'color .3s' }}>
+                        <Settings size={14} /> {!isMobile && 'Admin'}
+                    </button>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 12, flexShrink: 0 }}>
+                    {view === 'landing' && (
+                        <button onClick={() => setShowCart(true)} style={{ position: 'relative', background: transparent ? 'rgba(255,255,255,0.16)' : accent, backdropFilter: transparent ? 'blur(6px)' : 'none', border: transparent ? '1px solid rgba(255,255,255,0.4)' : 'none', color: transparent ? '#fff' : accentText, padding: isMobile ? '8px 12px' : '8px 18px', borderRadius: 99, fontSize: 13, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: isMobile ? 4 : 8, transition: 'all .3s' }}>
+                        <ShoppingCart size={16} /> {!isMobile && 'Panier'}
+                        {cart.count > 0 && <span style={{ background: currentTheme.danger || '#FF4757', color: '#fff', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, position: isMobile ? 'absolute' : 'static', top: isMobile ? -6 : 'auto', right: isMobile ? -6 : 'auto' }}>{cart.count}</span>}
+                        </button>
+                    )}
+                </div>
+            </nav>
+        );
+    }
+
+    // Layout 7 — Fractionnée (logo central)
+    if (layout === 7) return (
+        <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 150, background: navBg, backdropFilter: 'blur(12px)',
+            borderBottom: `1px solid ${navBorder}`, display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', padding: '0 24px', height: 60, gap: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <button onClick={() => setView('landing')} style={{ background: 'none', color: view === 'landing' ? accent : currentTheme.muted, border: 'none', fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Globe size={14} /> Vitrine
+                </button>
+                <span style={{ color: currentTheme.muted, fontSize: 12 }}>{restaurant.table}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifySelf: 'center', whiteSpace: 'nowrap' }}>
+                {restaurant.logo ? (
+                    <img src={restaurant.logo} alt="Logo" style={{ height: 28, width: 28, objectFit: 'contain', borderRadius: 4 }} />
+                ) : (
+                    <Trees size={18} style={{ color: accent }} />
+                )}
+                <span style={{ color: accent, fontWeight: 800, fontSize: 17, letterSpacing: -0.3 }}>{restaurant.name}</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifySelf: 'end' }}>
+                <button onClick={() => setView('dashboard')} style={{ background: 'none', color: view === 'dashboard' ? accent : currentTheme.muted, border: 'none', fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Settings size={14} /> Admin
+                </button>
+                {view === 'landing' && (
+                    <button onClick={() => setShowCart(true)} style={{ position: 'relative', background: accent, border: 'none', color: accentText, padding: '8px 16px', borderRadius: 99, fontSize: 12, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <ShoppingCart size={14} /> Panier
+                        {cart.count > 0 && <span style={{ background: currentTheme.danger || '#FF4757', color: '#fff', borderRadius: '50%', width: 18, height: 18, fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cart.count}</span>}
+                    </button>
+                )}
+            </div>
+        </nav>
+    );
+
     return <nav style={navStyle(layout === 2)}><NavContent /></nav>;
 };
 
@@ -143,12 +270,20 @@ export default function App() {
   const navBg = isLightTheme ? 'rgba(250, 248, 243, 0.94)' : 'rgba(10, 12, 15, 0.94)';
   const navBorder = currentTheme.border;
 
+  const rawNavLayout = restaurant.config[activeTheme]?.navLayout || 1;
+  const navLayout = isMobile && (rawNavLayout === 3 || rawNavLayout === 7) ? 1 : rawNavLayout;
+  const contentPadding = {
+    top: navLayout === 3 || navLayout === 5 || navLayout === 6 ? 0 : navLayout === 4 ? (isMobile ? 76 : 88) : navLayout === 7 ? 60 : 56,
+    left: navLayout === 3 ? 200 : 0,
+    bottom: navLayout === 5 ? (isMobile ? 72 : 76) : 0,
+  };
+
   return (
     <div style={{ fontFamily: currentTheme.font }}>
 
       <Nav restaurant={restaurant} accent={accent} accentText={accentText} currentTheme={currentTheme} navBg={navBg} navBorder={navBorder} view={view} setView={setView} setShowCart={setShowCart} cart={cart} activeTheme={activeTheme} isMobile={isMobile} />
 
-      <div style={{ paddingTop: (!isMobile && restaurant.config[activeTheme]?.navLayout === 3) ? 0 : 56, paddingLeft: (!isMobile && restaurant.config[activeTheme]?.navLayout === 3) ? 200 : 0 }}>
+      <div style={{ paddingTop: contentPadding.top, paddingLeft: contentPadding.left, paddingBottom: contentPadding.bottom }}>
         {view === 'landing' ? (
           <LandingPage menu={menu} cart={cart} onAdd={handleAdd} activeTheme={activeTheme} setActiveTheme={setActiveTheme} restaurant={restaurant} customThemeColors={customThemeColors} setSelectedItem={setSelectedItem} setView={setView} onReserve={() => setShowRes(true)} isMobile={isMobile} />
         ) : view === 'item-detail' ? (

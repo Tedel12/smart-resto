@@ -521,10 +521,15 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
                 <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
                     <h3 style={{...s.sectionTitle, fontSize: 16, marginBottom: 15}}>Disposition Navigation</h3>
                     <select value={draftRestaurant.config[activeTheme]?.navLayout || 1} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], navLayout: Number(e.target.value)}}}))} style={{...s.input, height: 40}}>
-                        <option value={1}>Style 1 (Standard)</option>
-                        <option value={2}>Style 2 (Logo Centré)</option>
-                        <option value={3}>Style 3 (Sidebar)</option>
+                        <option value={1}>Standard</option>
+                        <option value={2}>Logo Centré</option>
+                        <option value={3}>Sidebar</option>
+                        <option value={4}>Flottante (glass pill)</option>
+                        <option value={5}>Barre basse (mobile app)</option>
+                        <option value={6}>Transparente → solide au scroll</option>
+                        <option value={7}>Fractionnée (logo central)</option>
                     </select>
+                    <p style={{ color: D.muted, fontSize: 11, marginTop: 8 }}>Change et regarde le rendu directement dans l'onglet Vitrine.</p>
                 </div>
                 {/* Footer Config */}
                 <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
