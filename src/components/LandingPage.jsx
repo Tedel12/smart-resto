@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { THEMES, RESTAURANT } from '../data/index.js';
-import { Flame, ArrowRight, ChefHat, Minus, Plus, Palmtree, Zap, Star, Leaf, Coffee, Palette, CalendarCheck } from 'lucide-react';
+import { Flame, ArrowRight, ChefHat, Minus, Plus, Palmtree, Zap, Star, Leaf, Coffee, Palette, CalendarCheck, Award, Sparkles, ThumbsUp, Heart, Clock, Users, ShieldCheck } from 'lucide-react';
 import Footer from './Footer.jsx';
+
+const HIGHLIGHT_ICONS = { Award, Leaf, Sparkles, ThumbsUp, Coffee, Heart, Clock, Users, ChefHat, Zap, ShieldCheck, Palmtree, Star };
 
 const fmt = (n) => n.toLocaleString('fr-FR') + ' FCFA';
 
@@ -27,6 +29,18 @@ const getHero = (restaurant, activeTheme) => {
 
 const getCTA = (restaurant, activeTheme) => {
     return (restaurant.config && restaurant.config[activeTheme] && restaurant.config[activeTheme].cta) ? restaurant.config[activeTheme].cta : DEFAULT_CTA;
+};
+
+const DEFAULT_HIGHLIGHTS = [
+  { icon: 'Leaf', label: 'Produits frais' },
+  { icon: 'ChefHat', label: 'Fait maison' },
+  { icon: 'Clock', label: 'Service rapide' },
+  { icon: 'Star', label: 'Note excellente' },
+];
+
+const getHighlights = (restaurant, activeTheme) => {
+    const list = restaurant.config?.[activeTheme]?.highlights || RESTAURANT.config?.[activeTheme]?.highlights;
+    return (list && list.length > 0) ? list : DEFAULT_HIGHLIGHTS;
 };
 
 const Badge = ({ label, accent, accent2 }) => {
@@ -61,6 +75,33 @@ const CTASection = ({ cta, theme, onReserve }) => {
     </div>
 );};
 
+const HighlightsSection = ({ highlights, theme, variant = 'subtle' }) => {
+  const solid = variant === 'solid';
+  const fg = solid ? getContrastColor(theme.accent) : theme.text;
+  return (
+    <div style={{
+        background: solid ? theme.accent : theme.bg,
+        borderTop: solid ? 'none' : `1px solid ${theme.border}`,
+        borderBottom: solid ? 'none' : `1px solid ${theme.border}`,
+        padding: '36px clamp(20px, 6vw, 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: 'clamp(24px, 5vw, 56px)', flexWrap: 'wrap' }}>
+      {highlights.map((h, i) => {
+        const Icon = HIGHLIGHT_ICONS[h.icon] || Star;
+        return (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+                width: 34, height: 34, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: solid ? `${fg}1a` : `${theme.accent}18`, color: solid ? fg : theme.accent }}>
+              <Icon size={16} />
+            </div>
+            <span style={{ color: fg, fontSize: 12.5, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h.label}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setView, activeTheme, onReserve }) {
   const cats = Object.keys(menu);
   const [activeCat, setActiveCat] = useState(cats[0]);
@@ -68,6 +109,7 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   const [animating, setAnimating] = useState(false);
   const hero = getHero(restaurant, activeTheme);
   const cta = getCTA(restaurant, activeTheme);
+  const highlights = getHighlights(restaurant, activeTheme);
 
   React.useEffect(() => {
     setItems(menu[activeCat] || []);
@@ -82,13 +124,13 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
       <div style={{ position: 'relative', height: 520, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ position: 'absolute', inset: 0, background: `url(${hero.image}) center/cover`, filter: 'brightness(.25)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: `url(${hero.image}) center/cover`, filter: `brightness(${1 - (hero.overlayOpacity ?? 75) / 100})` }} />
         <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse at center, ${hero.color || t.accent}18 0%, transparent 70%)` }} />
         <div style={{ position: 'relative', textAlign: 'center', padding: '0 24px', fontFamily: hero.font || t.font }}>
           <div style={{ fontSize: 13, letterSpacing: 6, color: hero.color || t.accent, marginBottom: 20, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
             <Star size={14} /> Restaurant gastronomique <Star size={14} />
           </div>
-          <h1 style={{ fontSize: `clamp(42px, 8vw, ${hero.fontSize || 88}px)`, fontWeight: 800, lineHeight: 1, marginBottom: 16,
+          <h1 style={{ fontSize: `clamp(42px, 8vw, ${hero.fontSize || 88}px)`, fontWeight: hero.fontWeight || 800, lineHeight: 1, marginBottom: 16,
             color: hero.color || t.accent }}>
             {hero.title}
           </h1>
@@ -100,7 +142,7 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
                 fontSize: 14, fontWeight: 700, letterSpacing: 1, transition: 'transform .15s', cursor: 'pointer' }}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.04)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
-              Voir le menu
+              {hero.buttonText || 'Voir le menu'}
             </button>
           </div>
         </div>
@@ -165,6 +207,7 @@ function Theme1({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           })}
         </div>
       </div>
+      <HighlightsSection highlights={highlights} theme={t} />
       <CTASection cta={cta} theme={t} onReserve={onReserve} />
       <Footer restaurant={restaurant} theme={t} activeTheme={activeTheme} />
     </div>
@@ -177,6 +220,7 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   const currentCat = menu[activeCat] ? activeCat : cats[0];
   const hero = getHero(restaurant, activeTheme);
   const cta = getCTA(restaurant, activeTheme);
+  const highlights = getHighlights(restaurant, activeTheme);
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
@@ -184,13 +228,13 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: t.accent, color: getContrastColor(t.accent), fontSize: 11, fontWeight: 800, padding: '6px 18px', borderRadius: 99, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 24 }}>
           {hero.title}
         </span>
-        <h1 style={{ fontSize: `clamp(36px, 7vw, ${hero.fontSize || 72}px)`, fontWeight: 800, color: hero.color || t.accent, marginBottom: 18, lineHeight: 1.1 }}>{hero.tagline}</h1>
+        <h1 style={{ fontSize: `clamp(36px, 7vw, ${hero.fontSize || 72}px)`, fontWeight: hero.fontWeight || 800, color: hero.color || t.accent, marginBottom: 18, lineHeight: 1.1 }}>{hero.tagline}</h1>
         <p style={{ color: t.muted, fontSize: 18, marginBottom: 44, maxWidth: 520, margin: '0 auto 44px', lineHeight: 1.6 }}>{hero.description}</p>
         <button onClick={() => document.getElementById('menu-section2')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '18px 48px', borderRadius: 99, fontSize: 16, fontWeight: 700, boxShadow: `0 10px 30px ${t.accent}44`, transition: 'all .2s', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 12 }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 15px 40px ${t.accent}55`; }}
           onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 10px 30px ${t.accent}44`; }}>
-          Explorer le Lounge <ArrowRight size={20} />
+          {hero.buttonText || 'Explorer le Lounge'} <ArrowRight size={20} />
         </button>
       </div>
 
@@ -244,6 +288,7 @@ function Theme2({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           );
         })}
       </div>
+      <HighlightsSection highlights={highlights} theme={t} />
       <CTASection cta={cta} theme={t} onReserve={onReserve} />
       <Footer restaurant={restaurant} theme={t} activeTheme={activeTheme} />
     </div>
@@ -256,6 +301,7 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   const currentCat = menu[activeCat] ? activeCat : cats[0];
   const hero = getHero(restaurant, activeTheme);
   const cta = getCTA(restaurant, activeTheme);
+  const highlights = getHighlights(restaurant, activeTheme);
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
@@ -263,13 +309,13 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
         <div style={{ fontSize: 12, letterSpacing: 5, textTransform: 'uppercase', marginBottom: 16, opacity: .8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <Leaf size={14} /> {hero.title} <Leaf size={14} />
         </div>
-        <h1 style={{ fontSize: `clamp(38px, 7vw, ${hero.fontSize || 80}px)`, fontWeight: 900, marginBottom: 16, color: hero.color || t.accent }}>{hero.tagline}</h1>
+        <h1 style={{ fontSize: `clamp(38px, 7vw, ${hero.fontSize || 80}px)`, fontWeight: hero.fontWeight || 900, marginBottom: 16, color: hero.color || t.accent }}>{hero.tagline}</h1>
         <p style={{ fontSize: 18, opacity: .75, marginBottom: 40 }}>{hero.description}</p>
         <button onClick={() => document.getElementById('menu-section3')?.scrollIntoView({ behavior: 'smooth' })}
           style={{ background: t.accent, color: getContrastColor(t.accent), border: 'none', padding: '15px 44px', fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s', borderRadius: t.cardRadius }}
           onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
           onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}>
-          Notre Carte
+          {hero.buttonText || 'Notre Carte'}
         </button>
       </div>
 
@@ -321,6 +367,7 @@ function Theme3({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           })}
         </div>
       </div>
+      <HighlightsSection highlights={highlights} theme={t} />
       <CTASection cta={cta} theme={t} onReserve={onReserve} />
       <Footer restaurant={restaurant} theme={t} activeTheme={activeTheme} />
     </div>
@@ -333,22 +380,23 @@ function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   const currentCat = menu[activeCat] ? activeCat : cats[0];
   const hero = getHero(restaurant, activeTheme);
   const cta = getCTA(restaurant, activeTheme);
+  const highlights = getHighlights(restaurant, activeTheme);
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.font }}>
       <div style={{ position: 'relative', textAlign: 'center', padding: '100px 24px 80px', borderBottom: `1px solid ${t.border}`, overflow: 'hidden' }}>
         {hero.image && (
-            <div style={{ position: 'absolute', inset: 0, background: `url(${hero.image}) center/cover`, filter: 'brightness(0.3)' }} />
+            <div style={{ position: 'absolute', inset: 0, background: `url(${hero.image}) center/cover`, filter: `brightness(${1 - (hero.overlayOpacity ?? 70) / 100})` }} />
         )}
         <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ fontSize: 12, letterSpacing: 8, color: hero.color || t.accent, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, fontWeight: 800 }}>
               {hero.title}
             </div>
-            <h1 style={{ fontSize: `clamp(36px, 8vw, ${hero.fontSize || 64}px)`, fontWeight: 900, lineHeight: 1.1, marginBottom: 18, color: hero.color || t.accent }}>{hero.tagline}</h1>
+            <h1 style={{ fontSize: `clamp(36px, 8vw, ${hero.fontSize || 64}px)`, fontWeight: hero.fontWeight || 900, lineHeight: 1.1, marginBottom: 18, color: hero.color || t.accent }}>{hero.tagline}</h1>
             <p style={{ color: '#eee', fontSize: 17, marginBottom: 40 }}>{hero.description}</p>
             <button onClick={() => document.getElementById('menu-section4')?.scrollIntoView({ behavior: 'smooth' })}
               style={{ background: hero.color || t.accent, color: getContrastColor(hero.color || t.accent), border: 'none', padding: '18px 48px', borderRadius: t.cardRadius, fontSize: 15, fontWeight: 900, cursor: 'pointer', transition: 'all .2s' }}>
-              Commander sur place <ArrowRight size={20} />
+              {hero.buttonText || 'Commander sur place'} <ArrowRight size={20} />
             </button>
         </div>
       </div>
@@ -398,6 +446,7 @@ function Theme4({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           })}
         </div>
       </div>
+      <HighlightsSection highlights={highlights} theme={t} />
       <CTASection cta={cta} theme={t} onReserve={onReserve} />
       <Footer restaurant={restaurant} theme={t} activeTheme={activeTheme} />
     </div>
@@ -410,6 +459,7 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
   const currentCat = menu[activeCat] ? activeCat : cats[0];
   const hero = getHero(restaurant, activeTheme);
   const cta = getCTA(restaurant, activeTheme);
+  const highlights = getHighlights(restaurant, activeTheme);
 
   return (
     <div style={{ minHeight: '100vh', background: t.bg, color: t.text, fontFamily: hero.font || t.bodyFont || 'Inter, sans-serif' }}>
@@ -421,7 +471,7 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
           <div style={{ fontFamily: hero.font || t.font, fontSize: 13, letterSpacing: 8, color: t.accent2, marginBottom: 24, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 12 }}>
              <Palmtree size={18} /> {hero.tagline}
           </div>
-          <h1 style={{ fontFamily: hero.font || t.font, fontSize: `clamp(52px, 8vw, ${hero.fontSize || 96}px)`, fontWeight: 600, color: hero.color || '#FAF8F3', lineHeight: 1.1, marginBottom: 24, fontStyle: 'italic' }}>
+          <h1 style={{ fontFamily: hero.font || t.font, fontSize: `clamp(52px, 8vw, ${hero.fontSize || 96}px)`, fontWeight: hero.fontWeight || 600, color: hero.color || '#FAF8F3', lineHeight: 1.1, marginBottom: 24, fontStyle: 'italic' }}>
             {hero.title}
           </h1>
           <div style={{ width: 60, height: 1, background: t.accent2, marginBottom: 32 }} />
@@ -434,23 +484,12 @@ function Theme5({ menu, onAdd, cart, restaurant, theme: t, setSelectedItem, setV
               fontFamily: 'Inter, sans-serif', fontWeight: 500 }}
             onMouseEnter={e => { e.currentTarget.style.background = t.accent2; e.currentTarget.style.borderColor = t.accent2; e.currentTarget.style.color = '#1C1A15'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(250,248,243,.4)'; e.currentTarget.style.color = '#FAF8F3'; }}>
-            Découvrir la carte
+            {hero.buttonText || 'Découvrir la carte'}
           </button>
         </div>
       </div>
 
-      <div style={{ background: t.accent, padding: '20px clamp(20px, 6vw, 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(20px, 5vw, 60px)', flexWrap: 'wrap' }}>
-        {[
-          { label: 'Authentique', icon: Leaf },
-          { label: 'Produits locaux', icon: Palmtree },
-          { label: 'Chef étoilé', icon: ChefHat },
-          { label: 'Tradition', icon: Star }
-        ].map(s => (
-          <span key={s.label} style={{ color: '#FAF8F3', fontSize: 12, letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <s.icon size={14} /> {s.label}
-          </span>
-        ))}
-      </div>
+      <HighlightsSection highlights={highlights} theme={t} variant="solid" />
 
       <div id="menu-section5" style={{ maxWidth: 1000, margin: '0 auto', padding: '100px 24px 120px' }}>
         <div style={{ textAlign: 'center', marginBottom: 80 }}>

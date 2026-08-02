@@ -5,8 +5,9 @@ import CartSidebar from './components/CartSidebar.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import ItemDetail from './components/ItemDetail.jsx';
 import { D, dFont, RESTAURANT, THEMES, MENU, TABLES } from './data/index.js';
-import { Trees, Globe, Settings, ShoppingCart, PartyPopper, Check } from 'lucide-react';
+import { Trees, Globe, Settings, ShoppingCart, Check, CalendarCheck, ChefHat } from 'lucide-react';
 import ReservationModal from './components/ReservationModal.jsx';
+import AlertModal from './components/AlertModal.jsx';
 
 const Nav = ({ restaurant, accent, accentText, currentTheme, navBg, navBorder, view, setView, setShowCart, cart, activeTheme, isMobile }) => {
     const rawLayout = restaurant.config[activeTheme]?.navLayout || 1;
@@ -102,12 +103,18 @@ export default function App() {
     }
   });
   const [showRes, setShowRes] = useState(false);
+  const [alertBox, setAlertBox] = useState(null);
 
   const handleReserve = (data) => {
    addReservation(data);
    data.tables.forEach(table => setTableStatus(table, 'réservée'));
    setShowRes(false);
-   showToast(<><PartyPopper size={16} /> Réservation confirmée pour {data.firstName} {data.lastName} !</>, D.green);
+   setAlertBox({
+     icon: CalendarCheck,
+     title: 'Réservation confirmée !',
+     message: `Merci ${data.firstName} ${data.lastName}, votre table (${data.tables.join(', ')}) est réservée pour le ${data.date} à ${data.time}. Nous avons hâte de vous accueillir !`,
+     buttonText: 'Parfait !',
+   });
   };
   const [menu, setMenu] = useState(() => {
     try {
@@ -200,7 +207,13 @@ export default function App() {
     addOrder({ table: restaurant.table, items: cart.items, comment, paymentMethod });
     cart.clear();
     setShowCart(false);
-    showToast(<><PartyPopper size={16} /> Commande envoyée en cuisine !</>, D.gold);
+    setAlertBox({
+      icon: ChefHat,
+      title: 'Commande envoyée !',
+      message: `Votre commande a bien été transmise en cuisine pour la ${restaurant.table}. Elle sera prête très bientôt.`,
+      color: accent,
+      buttonText: 'Miam, merci !',
+    });
   };
 
   const isLightTheme = currentTheme.bg === '#FFFFFF' || currentTheme.bg === '#FAF8F3' || currentTheme.bg === '#FFFBF5';
@@ -223,7 +236,19 @@ export default function App() {
       </div>
 
       {showRes && <ReservationModal onClose={() => setShowRes(false)} onSubmit={handleReserve} tables={TABLES} tableStatus={tableStatus} accent={accent} font={currentTheme.bodyFont || currentTheme.font} />}
-      
+
+      {alertBox && (
+        <AlertModal
+          icon={alertBox.icon}
+          title={alertBox.title}
+          message={alertBox.message}
+          color={alertBox.color || D.green}
+          buttonText={alertBox.buttonText}
+          font={currentTheme.bodyFont || currentTheme.font}
+          onClose={() => setAlertBox(null)}
+        />
+      )}
+
       {/* ── Cart Sidebar ── */}
       {showCart && (
         <CartSidebar cart={cart} onClose={() => setShowCart(false)} onCheckout={handleCheckout} theme={currentTheme} activeTheme={activeTheme} customThemeColors={customThemeColors} />

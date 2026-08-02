@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { D_DARK, D_LIGHT, dFont, THEMES } from '../data/index.js';
+import { D_DARK, D_LIGHT, dFont, THEMES, HERO_FONTS, HERO_FONT_WEIGHTS } from '../data/index.js';
 import { ClipboardList, BarChart3, Utensils, Palette, Hourglass, ChefHat, CheckCircle, DollarSign, TrendingUp, Receipt, Pencil, Trash2, Sun, Moon, Map, Menu, X, MapPin, Settings, Wallet, CalendarCheck, User, Phone, Users, Calendar, Clock, CreditCard, StickyNote } from 'lucide-react';
 import { useMediaQuery } from '../hooks/index.js';
 
@@ -38,6 +38,19 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
   const s = {
     sectionTitle: { color: D.text, fontSize: 20, fontWeight: 800, marginBottom: 20, letterSpacing: -0.3 },
     input: { width: '100%', background: D.bg, border: `1px solid ${D.border}`, borderRadius: 8, padding: '10px 14px', color: D.text, fontFamily: dFont, fontSize: 13, outline: 'none' },
+  };
+
+  const updateHero = (key, value) => {
+    setDraftRestaurant(prev => ({
+        ...prev,
+        config: {
+            ...prev.config,
+            [activeTheme]: {
+                ...prev.config[activeTheme],
+                hero: { ...prev.config[activeTheme].hero, [key]: value }
+            }
+        }
+    }));
   };
 
   const updateFooter = (key, value) => {
@@ -448,43 +461,50 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
                 <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
                     <h3 style={{...s.sectionTitle, fontSize: 16, marginBottom: 15}}>Section Hero</h3>
                     <label style={{ color: D.muted, fontSize: 12 }}>Titre</label>
-                    <input value={draftRestaurant.config[activeTheme]?.hero?.title || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, title: e.target.value}}}}))} style={{...s.input, marginBottom: 10}} />
-                    
+                    <input value={draftRestaurant.config[activeTheme]?.hero?.title || ''} onChange={e => updateHero('title', e.target.value)} style={{...s.input, marginBottom: 10}} />
+
                     <label style={{ color: D.muted, fontSize: 12 }}>Tagline</label>
-                    <input value={draftRestaurant.config[activeTheme]?.hero?.tagline || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, tagline: e.target.value}}}}))} style={{...s.input, marginBottom: 10}} />
+                    <input value={draftRestaurant.config[activeTheme]?.hero?.tagline || ''} onChange={e => updateHero('tagline', e.target.value)} style={{...s.input, marginBottom: 10}} />
 
                     <label style={{ color: D.muted, fontSize: 12 }}>Description</label>
-                    <textarea value={draftRestaurant.config[activeTheme]?.hero?.description || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, description: e.target.value}}}}))} style={{...s.input, marginBottom: 10, minHeight: 60}} />
+                    <textarea value={draftRestaurant.config[activeTheme]?.hero?.description || ''} onChange={e => updateHero('description', e.target.value)} style={{...s.input, marginBottom: 10, minHeight: 60}} />
+
+                    <label style={{ color: D.muted, fontSize: 12 }}>Texte du bouton principal</label>
+                    <input value={draftRestaurant.config[activeTheme]?.hero?.buttonText || ''} placeholder="Voir le menu" onChange={e => updateHero('buttonText', e.target.value)} style={{...s.input, marginBottom: 10}} />
 
                     <label style={{ color: D.muted, fontSize: 12 }}>Image</label>
                     <input type="file" accept="image/*" onChange={(e) => {
                         const file = e.target.files[0];
                         if (file) {
                             const reader = new FileReader();
-                            reader.onloadend = () => {
-                                setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, image: reader.result}}}}));
-                            };
+                            reader.onloadend = () => updateHero('image', reader.result);
                             reader.readAsDataURL(file);
                         }
-                    }} style={s.input} />
+                    }} style={{...s.input, marginBottom: 10}} />
+
+                    <label style={{ color: D.muted, fontSize: 12 }}>Assombrissement de l'image ({draftRestaurant.config[activeTheme]?.hero?.overlayOpacity ?? 75}%)</label>
+                    <input type="range" min={0} max={95} value={draftRestaurant.config[activeTheme]?.hero?.overlayOpacity ?? 75} onChange={e => updateHero('overlayOpacity', Number(e.target.value))} style={{ width: '100%', marginBottom: 10, accentColor: accent }} />
 
                     <div style={{display: 'flex', gap: 20, marginTop: 10, flexWrap: 'wrap'}}>
-                        <div style={{flex: 1}}>
+                        <div style={{flex: 1, minWidth: 140}}>
                             <label style={{ color: D.muted, fontSize: 12 }}>Couleur d'accent</label>
-                            <input type="color" value={draftRestaurant.config[activeTheme]?.hero?.color || '#F5A623'} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, color: e.target.value}}}}))} style={{...s.input, padding: 5, height: 40}} />
+                            <input type="color" value={draftRestaurant.config[activeTheme]?.hero?.color || '#F5A623'} onChange={e => updateHero('color', e.target.value)} style={{...s.input, padding: 5, height: 40}} />
                         </div>
-                        <div style={{flex: 1}}>
+                        <div style={{flex: 1, minWidth: 160}}>
                             <label style={{ color: D.muted, fontSize: 12 }}>Police</label>
-                            <select value={draftRestaurant.config[activeTheme]?.hero?.font || 'Sora'} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, font: e.target.value}}}}))} style={{...s.input, height: 40}}>
-                                <option>Sora</option>
-                                <option>Inter</option>
-                                <option>Quicksand</option>
-                                <option>Cormorant Garamond</option>
+                            <select value={draftRestaurant.config[activeTheme]?.hero?.font || 'Sora'} onChange={e => updateHero('font', e.target.value)} style={{...s.input, height: 40}}>
+                                {HERO_FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
                             </select>
                         </div>
-                        <div style={{flex: 1}}>
+                        <div style={{flex: 1, minWidth: 140}}>
+                            <label style={{ color: D.muted, fontSize: 12 }}>Graisse du titre</label>
+                            <select value={draftRestaurant.config[activeTheme]?.hero?.fontWeight || 800} onChange={e => updateHero('fontWeight', Number(e.target.value))} style={{...s.input, height: 40}}>
+                                {HERO_FONT_WEIGHTS.map(w => <option key={w.value} value={w.value}>{w.label}</option>)}
+                            </select>
+                        </div>
+                        <div style={{flex: 1, minWidth: 140}}>
                             <label style={{ color: D.muted, fontSize: 12 }}>Taille Titre (px)</label>
-                            <input type="number" value={draftRestaurant.config[activeTheme]?.hero?.fontSize || 88} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], hero: {...prev.config[activeTheme].hero, fontSize: e.target.value}}}}))} style={{...s.input, height: 40}} />
+                            <input type="number" value={draftRestaurant.config[activeTheme]?.hero?.fontSize || 88} onChange={e => updateHero('fontSize', e.target.value)} style={{...s.input, height: 40}} />
                         </div>
                     </div>
                 </div>
@@ -551,14 +571,27 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
                 </div>
               </div>
               <div style={{ position: 'sticky', top: 20 }}>
-                <h3 style={{...s.sectionTitle, fontSize: 14}}>Aperçu</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                  <h3 style={{...s.sectionTitle, fontSize: 14, marginBottom: 0}}>Aperçu</h3>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: D.green, fontSize: 10, fontWeight: 700, background: `${D.green}18`, padding: '3px 9px', borderRadius: 99 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: D.green, animation: 'pulse 1.6s ease-in-out infinite' }} /> Temps réel
+                  </span>
+                </div>
+                {(() => {
+                  const draftHero = draftRestaurant.config[activeTheme]?.hero || {};
+                  const heroFont = `'${draftHero.font || 'Sora'}', sans-serif`;
+                  const heroDim = 1 - (draftHero.overlayOpacity ?? 75) / 100;
+                  return (
                 <div style={{ background: D.card, border: `1px solid ${D.border}`, padding: 20, borderRadius: 12 }}>
                     <div style={{color: D.muted, fontSize: 11, fontWeight: 700, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase'}}>Hero</div>
-                    <div style={{ height: 150, background: '#000', borderRadius: 8, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 10 }}>
-                        <div style={{ position: 'absolute', inset: 0, background: `url(${draftRestaurant.config[activeTheme]?.hero?.image || ''}) center/cover`, filter: 'brightness(.4)' }} />
-                        <div style={{position: 'relative', color: '#fff'}}>
-                            <h1 style={{fontSize: 16, margin: 0, color: draftRestaurant.config[activeTheme]?.hero?.color || accent}}>{draftRestaurant.config[activeTheme]?.hero?.title || 'Titre'}</h1>
-                            <p style={{fontSize: 10, margin: '4px 0'}}>{draftRestaurant.config[activeTheme]?.hero?.tagline || 'Tagline'}</p>
+                    <div style={{ height: 160, background: '#000', borderRadius: 8, overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 14 }}>
+                        <div style={{ position: 'absolute', inset: 0, background: `url(${draftHero.image || ''}) center/cover`, filter: `brightness(${heroDim})`, transition: 'filter .2s' }} />
+                        <div style={{position: 'relative', color: '#fff', fontFamily: heroFont}}>
+                            <h1 style={{fontSize: 18, margin: 0, fontWeight: draftHero.fontWeight || 800, color: draftHero.color || accent, transition: 'all .15s'}}>{draftHero.title || 'Titre'}</h1>
+                            <p style={{fontSize: 10, margin: '6px 0 10px', opacity: 0.85}}>{draftHero.tagline || 'Tagline'}</p>
+                            <span style={{ display: 'inline-block', background: draftHero.color || accent, color: getContrastColor(draftHero.color || accent), fontSize: 9, fontWeight: 800, padding: '5px 12px', borderRadius: 99 }}>
+                                {draftHero.buttonText || 'Voir le menu'}
+                            </span>
                         </div>
                     </div>
                     <div style={{color: D.muted, fontSize: 11, fontWeight: 700, marginTop: 20, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase'}}>CTA</div>
@@ -574,6 +607,8 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
                         <div style={{opacity: 0.7}}>{draftRestaurant.config[activeTheme]?.footer?.phone || ''}</div>
                     </div>
                 </div>
+                  );
+                })()}
               </div>
             </div>
           )}
