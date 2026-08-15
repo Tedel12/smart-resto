@@ -57,16 +57,17 @@ const Badge = ({ label, accent, accent2 }) => {
 };
 
 const CTASection = ({ cta, theme, onReserve }) => {
-    const textColor = getContrastColor(theme.accent);
+    const bg = cta.color || theme.accent;
+    const textColor = getContrastColor(bg);
     return (
-    <div style={{ position: 'relative', overflow: 'hidden', background: theme.accent, color: textColor, padding: 'clamp(48px, 8vw, 76px) 24px', textAlign: 'center' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', background: bg, color: textColor, padding: 'clamp(48px, 8vw, 76px) 24px', textAlign: 'center', transition: 'background .2s' }}>
         <div style={{ position: 'absolute', inset: 0, opacity: 0.08, backgroundImage: `radial-gradient(${textColor} 1.5px, transparent 1.5px)`, backgroundSize: '22px 22px', pointerEvents: 'none' }} />
         <div style={{ position: 'relative' }}>
             <div style={{ width: 52, height: 52, borderRadius: '50%', background: `${textColor}1a`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                 <CalendarCheck size={24} />
             </div>
             <h2 style={{ fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 800, marginBottom: 28, letterSpacing: -0.5 }}>{cta.title}</h2>
-            <button onClick={onReserve} style={{ background: textColor, color: theme.accent, border: 'none', padding: '16px 36px', borderRadius: 99, fontSize: 15, fontWeight: 800, cursor: 'pointer', letterSpacing: 0.3, transition: 'transform .2s, box-shadow .2s', boxShadow: `0 8px 24px rgba(0,0,0,0.15)` }}
+            <button onClick={onReserve} style={{ background: textColor, color: bg, border: 'none', padding: '16px 36px', borderRadius: 99, fontSize: 15, fontWeight: 800, cursor: 'pointer', letterSpacing: 0.3, transition: 'transform .2s, box-shadow .2s', boxShadow: `0 8px 24px rgba(0,0,0,0.15)` }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
                 {cta.buttonText}

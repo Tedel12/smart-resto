@@ -53,6 +53,19 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
     }));
   };
 
+  const updateCTA = (key, value) => {
+    setDraftRestaurant(prev => ({
+        ...prev,
+        config: {
+            ...prev.config,
+            [activeTheme]: {
+                ...prev.config[activeTheme],
+                cta: { ...prev.config[activeTheme].cta, [key]: value }
+            }
+        }
+    }));
+  };
+
   const updateFooter = (key, value) => {
     setDraftRestaurant(prev => ({
         ...prev,
@@ -395,7 +408,22 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
 
               {Object.entries(menu).map(([cat, items]) => (
                 <div key={cat} style={{ marginBottom: 32 }}>
-                  <div style={{ color: accent, fontSize: 13, fontWeight: 700, marginBottom: 12 }}>{cat}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <div style={{ color: accent, fontSize: 13, fontWeight: 700 }}>{cat} <span style={{ color: D.muted, fontWeight: 500 }}>({(items || []).length})</span></div>
+                    <button onClick={() => {
+                        if (window.confirm(`Supprimer la catégorie "${cat}" et ses ${(items || []).length} plat(s) ?`)) {
+                          setMenu(prev => {
+                            const next = { ...prev };
+                            delete next[cat];
+                            return next;
+                          });
+                        }
+                      }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.muted, display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 600 }}
+                      onMouseEnter={e => e.currentTarget.style.color = D.red}
+                      onMouseLeave={e => e.currentTarget.style.color = D.muted}>
+                      <Trash2 size={13} /> Supprimer la catégorie
+                    </button>
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {(items || []).map(item => (
                       <div key={item.id} style={{ background: D.card, border: `1px solid ${D.border}`, borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14, transition: 'border-color .15s' }}>
@@ -512,10 +540,21 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
                 <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
                     <h3 style={{...s.sectionTitle, fontSize: 16, marginBottom: 15}}>Section Call to Action</h3>
                     <label style={{ color: D.muted, fontSize: 12 }}>Titre CTA</label>
-                    <input value={draftRestaurant.config[activeTheme]?.cta?.title || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], cta: {...prev.config[activeTheme].cta, title: e.target.value}}}}))} style={{...s.input, marginBottom: 10}} />
-                    
+                    <input value={draftRestaurant.config[activeTheme]?.cta?.title || ''} onChange={e => updateCTA('title', e.target.value)} style={{...s.input, marginBottom: 10}} />
+
                     <label style={{ color: D.muted, fontSize: 12 }}>Texte bouton</label>
-                    <input value={draftRestaurant.config[activeTheme]?.cta?.buttonText || ''} onChange={e => setDraftRestaurant(prev => ({...prev, config: {...prev.config, [activeTheme]: {...prev.config[activeTheme], cta: {...prev.config[activeTheme].cta, buttonText: e.target.value}}}}))} style={{...s.input, marginBottom: 10}} />
+                    <input value={draftRestaurant.config[activeTheme]?.cta?.buttonText || ''} onChange={e => updateCTA('buttonText', e.target.value)} style={{...s.input, marginBottom: 10}} />
+
+                    <label style={{ color: D.muted, fontSize: 12 }}>Couleur du cadre CTA</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <input type="color" value={draftRestaurant.config[activeTheme]?.cta?.color || accent} onChange={e => updateCTA('color', e.target.value)} style={{...s.input, padding: 5, height: 40, width: 60, flexShrink: 0}} />
+                        <input value={draftRestaurant.config[activeTheme]?.cta?.color || ''} placeholder={`Couleur du template (${accent})`} onChange={e => updateCTA('color', e.target.value)} style={{...s.input, flex: 1}} />
+                        {draftRestaurant.config[activeTheme]?.cta?.color && (
+                            <button onClick={() => updateCTA('color', '')} title="Revenir à la couleur du template" style={{ background: D.bg, border: `1px solid ${D.border}`, borderRadius: 8, width: 40, height: 40, cursor: 'pointer', color: D.muted, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <X size={16} />
+                            </button>
+                        )}
+                    </div>
                 </div>
                 {/* Nav Layout Config */}
                 <div style={{ background: D.card, padding: 20, borderRadius: 12, marginBottom: 20 }}>
@@ -574,6 +613,7 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
                         </div>
                     </div>
                 </div>
+                <button onClick={saveConfig} style={{ width: '100%', background: accent, color: isDarkMode ? '#000' : '#fff', border: 'none', padding: '14px', borderRadius: 10, fontWeight: 800, fontSize: 14, cursor: 'pointer', marginBottom: 20 }}>Enregistrer les modifications</button>
               </div>
               <div style={{ position: 'sticky', top: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
@@ -600,10 +640,15 @@ export default function Dashboard({ menu, setMenu, orders, updateStatus, markPai
                         </div>
                     </div>
                     <div style={{color: D.muted, fontSize: 11, fontWeight: 700, marginTop: 20, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase'}}>CTA</div>
-                    <div style={{ background: accent, color: getContrastColor(accent), padding: 15, borderRadius: 8, fontSize: 10, textAlign: 'center' }}>
-                        <div style={{fontWeight: 700, marginBottom: 5}}>{draftRestaurant.config[activeTheme]?.cta?.title || 'Titre CTA'}</div>
-                        <div style={{background: 'rgba(0,0,0,0.2)', padding: '5px 10px', borderRadius: 4, display: 'inline-block'}}>{draftRestaurant.config[activeTheme]?.cta?.buttonText || 'Bouton'}</div>
-                    </div>
+                    {(() => {
+                      const ctaColor = draftRestaurant.config[activeTheme]?.cta?.color || accent;
+                      return (
+                        <div style={{ background: ctaColor, color: getContrastColor(ctaColor), padding: 15, borderRadius: 8, fontSize: 10, textAlign: 'center', transition: 'background .15s' }}>
+                            <div style={{fontWeight: 700, marginBottom: 5}}>{draftRestaurant.config[activeTheme]?.cta?.title || 'Titre CTA'}</div>
+                            <div style={{background: 'rgba(0,0,0,0.2)', padding: '5px 10px', borderRadius: 4, display: 'inline-block'}}>{draftRestaurant.config[activeTheme]?.cta?.buttonText || 'Bouton'}</div>
+                        </div>
+                      );
+                    })()}
                     <div style={{color: D.muted, fontSize: 11, fontWeight: 700, marginTop: 20, marginBottom: 10, letterSpacing: 1, textTransform: 'uppercase'}}>Footer</div>
                     <div style={{ background: '#1c1c1c', color: '#fff', padding: 15, borderRadius: 8, fontSize: 10, textAlign: 'center' }}>
                         {draftRestaurant.logo && <img src={draftRestaurant.logo} style={{height: 30, marginBottom: 5}} alt="Logo" />}
