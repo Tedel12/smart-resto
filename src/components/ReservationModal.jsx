@@ -22,8 +22,13 @@ export default function ReservationModal({ onClose, onSubmit, tables, tableStatu
 
     const set = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
 
+    const isUnavailable = (table) => {
+        const st = tableStatus[table] || 'libre';
+        return (st === 'réservée' || st === 'occupée') && !form.tables.includes(table);
+    };
+
     const toggleTable = (table) => {
-        if ((tableStatus[table] || 'libre') === 'réservée' && !form.tables.includes(table)) return;
+        if (isUnavailable(table)) return;
         setForm(prev => ({
             ...prev,
             tables: prev.tables.includes(table) ? prev.tables.filter(t => t !== table) : [...prev.tables, table]
@@ -132,9 +137,10 @@ export default function ReservationModal({ onClose, onSubmit, tables, tableStatu
                             {tables.map(table => {
                                 const st = tableStatus[table] || 'libre';
                                 const selected = form.tables.includes(table);
-                                const disabled = st === 'réservée' && !selected;
+                                const disabled = isUnavailable(table);
                                 return (
                                     <button key={table} type="button" onClick={() => toggleTable(table)} disabled={disabled}
+                                        title={disabled ? `${table} — ${st}` : table}
                                         style={{
                                             padding: '10px 6px', borderRadius: 10, border: `1.5px solid ${selected ? accent : '#E2E2E2'}`,
                                             background: selected ? accent : disabled ? '#F0F0F0' : '#fff',
@@ -144,7 +150,7 @@ export default function ReservationModal({ onClose, onSubmit, tables, tableStatu
                                         }}>
                                         <Utensils size={14} />
                                         {table}
-                                        {disabled && <span style={{ fontSize: 9, fontWeight: 600 }}>Réservée</span>}
+                                        {disabled && <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'capitalize' }}>{st}</span>}
                                         {selected && <Check size={12} />}
                                     </button>
                                 );
